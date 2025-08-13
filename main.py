@@ -1,4 +1,4 @@
-from src.gcode_machine import GcodeMachine
+from actuator_xrl8.gcode_machine import GcodeMachine
 
 
 def main():

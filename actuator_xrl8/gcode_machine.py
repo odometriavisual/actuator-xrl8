@@ -1,23 +1,41 @@
-import src.virtual_encoder_api as encoder
+import numpy as np
+from numpy.typing import NDArray
+
+from actuator_xrl8 import virtual_encoder_api as encoder
 
 
 class GcodeMachine:
     def __init__(self):
+        # Current postion in number of steps
+        self.position = np.array([0, 0], dtype=int)
+
+        # Constants in number of steps
+        self.STEPS_PER_MM: int = 5 * 8
+        self.WIDTH: int = 100 * self.STEPS_PER_MM
+        self.HEIGHT: int = 100 * self.STEPS_PER_MM
+
+        # Flags
+        self.is_endstop_hit = False  # True if endstop was hit
+        self.is_home = False  # Set to True after the home calibration
+
         raise NotImplementedError()
 
-    def g0(self, x, y):
+    def _convert_mm_to_steps(self, a: NDArray):
+        return (a * self.STEPS_PER_MM).astype(int)
+
+    def g0(self, x: float, y: float):
         """
         Fast linear movement. Used when the acquire is disabled.
         """
         raise NotImplementedError()
 
-    def g1(self, x, y, s):
+    def g1(self, x: float, y: float, s: float):
         """
         Linear movement. Used when the acquire is enabled.
         """
         raise NotImplementedError()
 
-    def g4(self, p):
+    def g4(self, p: int):
         """
         Dwell. Stops for p millisecons.
         """

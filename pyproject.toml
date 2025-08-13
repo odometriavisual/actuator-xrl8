@@ -1,0 +1,9 @@
+[project]
+name = "actuator-xrl8"
+version = "0.1.0"
+description = "2D actuator for tests with an ultrasound probe"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "flask>=3.1.1",
+]

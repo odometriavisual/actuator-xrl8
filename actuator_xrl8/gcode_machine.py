@@ -18,7 +18,6 @@ class GcodeMachine:
         self.is_endstop_hit = False  # True if endstop was hit
         self.is_home = False  # Set to True after the home calibration
 
-        raise NotImplementedError()
 
     def _convert_mm_to_steps(self, a: NDArray):
         return (a * self.STEPS_PER_MM).astype(int)
@@ -27,13 +26,13 @@ class GcodeMachine:
         """
         Fast linear movement. Used when the acquire is disabled.
         """
-        raise NotImplementedError()
+        print(f'Recebido comando g0: {x = } {y = }')
 
     def g1(self, x: float, y: float, s: float):
         """
         Linear movement. Used when the acquire is enabled.
         """
-        raise NotImplementedError()
+        print(f'Recebido comando g1: {x = } {y = } {s = }')
 
     def g4(self, p: int):
         """

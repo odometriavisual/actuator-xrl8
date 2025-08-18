@@ -1,0 +1,27 @@
+.trajetoria {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+  height: calc(100% - 50px)
+}
+
+.trajetoria table {
+  flex-grow: 1;
+  width: 100%;
+  border-collapse: collapse;
+  user-select: none;
+
+  display: inline-block;
+  overflow: auto;
+}
+
+.trajetoria table th,
+td {
+  padding-right: 12px;
+}
+
+.trajetoria table input,
+select {
+  width: 100%;
+}

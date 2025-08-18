@@ -1,19 +1,21 @@
 from actuator_xrl8.gcode_machine import GcodeMachine
+from actuator_xrl8.gcode_interpreter import GcodeInterpreter
 
 
 def main():
     machine = GcodeMachine()
 
-    # Home
-    machine.g28()
+    while True:
+        s = input()
 
-    # Random movement
-    machine.g1(10, 10, 5)
-    machine.g1(100, 10, 5)
-    machine.g1(50, 50, 5)
+        interpreter = GcodeInterpreter(s, machine)
 
-    # Home
-    machine.g28()
+        while status := interpreter.run():
+            if status is None:
+                print('Comando executado com sucesso')
+            elif status is not True:
+                print(f'Erro ao executar comando: {status}')
+
 
 
 if __name__ == "__main__":

@@ -21,6 +21,9 @@ class GcodeInterpreter:
         self._lexer = Lexer(gcode)
         self._machine = gcode_machine
 
+    def is_finished(self):
+        return not self._lexer.available()
+
     def step(self):
         if self._lexer.available():
             tok = self._lexer.get_next_token()
@@ -102,6 +105,8 @@ class GcodeInterpreter:
 
             else:
                 return f'gcode error: invalid "{tok}" code'
+
+            return True
         else:
             return None
 

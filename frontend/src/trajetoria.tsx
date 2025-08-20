@@ -1,10 +1,13 @@
-import { useRef, useState } from 'preact/hooks'
+import { useMemo, useRef, useState } from 'preact/hooks'
+
+import { io } from 'socket.io-client'
 
 import './trajetoria.css'
 
 export function Trajetoria({ nodes, setNodes }: any) {
   const [nextId, setNextId] = useState<number>(0);
   const rowDragIndex = useRef<number | null>(null);
+  const socket = useMemo<any>(() => io(), []);
 
   function addNode(e: Event) {
     e.preventDefault();
@@ -48,7 +51,11 @@ export function Trajetoria({ nodes, setNodes }: any) {
       return `G1 X${n.x} Y${n.y} S${n.s}`;
     }).join('\n');
 
-    console.log(gcode);
+    socket.emit("gcode", gcode)
+  }
+
+  function step() {
+    socket.emit("step")
   }
 
   function onRowDragStart(e: any, i: number) {
@@ -115,9 +122,9 @@ export function Trajetoria({ nodes, setNodes }: any) {
         </tbody>
       </table>
       <button onClick={addNode}> + </button>
-      <button onClick={generateGcode}> Step </button>
-      <button onClick={generateGcode}> Pause/Play </button>
-      <button onClick={generateGcode}> Stop </button>
+      <button onClick={step}> Step </button>
+      <button onClick={() => alert('not implemented')}> Pause/Play </button>
+      <button onClick={() => alert('not implemented')}> Stop </button>
       <button onClick={generateGcode}> Start </button>
     </div>
   )

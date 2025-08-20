@@ -7,6 +7,9 @@ class NullGcodeMachine:
     def __init__(self):
         pass
 
+    def get_position(self) -> (float, float):
+        return 0, 0
+
     def _convert_mm_to_steps(self, a: NDArray):
         return (a * self.STEPS_PER_MM).astype(int)
 
@@ -20,7 +23,13 @@ class NullGcodeMachine:
         """
         Linear movement. Used when the acquire is enabled.
         """
-        print(f'Recebido comando g1: {x = } {y = } {s = }')
+        print(f"Recebido comando g1: {x = } {y = } {s = }")
+
+        start = self.pos.copy()
+        end = np.array([x, y])
+        for i in range(30):
+            self.pos = (start * (29-i) + end * i)/29
+            sleep(1/30)
 
     def g4(self, p: int):
         """
@@ -38,13 +47,13 @@ class NullGcodeMachine:
         """
         Absolute coordinates. Movement commands use absolute coordinates.
         """
-        print(f'Recebido comando g90')
+        print("Recebido comando g90")
 
     def g91(self):
         """
         Relative coordinates. Movement commands use relative coordinates.
         """
-        print(f'Recebido comando g91')
+        print("Recebido comando g91")
 
     def m1000(self, f: int, acquisition_name: str):
         """

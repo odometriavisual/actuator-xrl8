@@ -3,21 +3,9 @@ from numpy.typing import NDArray
 
 from actuator_xrl8 import virtual_encoder_api as encoder
 
-
-class GcodeMachine:
+class NullGcodeMachine:
     def __init__(self):
-        # Current postion in number of steps
-        self.position = np.array([0, 0], dtype=int)
-
-        # Constants in number of steps
-        self.STEPS_PER_MM: int = 5 * 8
-        self.WIDTH: int = 100 * self.STEPS_PER_MM
-        self.HEIGHT: int = 100 * self.STEPS_PER_MM
-
-        # Flags
-        self.is_endstop_hit = False  # True if endstop was hit
-        self.is_home = False  # Set to True after the home calibration
-
+        pass
 
     def _convert_mm_to_steps(self, a: NDArray):
         return (a * self.STEPS_PER_MM).astype(int)
@@ -38,25 +26,25 @@ class GcodeMachine:
         """
         Dwell. Stops for p millisecons.
         """
-        raise NotImplementedError()
+        print(f'Recebido comando g4: {p = }')
 
     def g28(self):
         """
         Auto home. Finds home position by moving to the endstops.
         """
-        raise NotImplementedError()
+        print(f'Recebido comando g28')
 
     def g90(self):
         """
         Absolute coordinates. Movement commands use absolute coordinates.
         """
-        raise NotImplementedError()
+        print(f'Recebido comando g90')
 
     def g91(self):
         """
         Relative coordinates. Movement commands use relative coordinates.
         """
-        raise NotImplementedError()
+        print(f'Recebido comando g91')
 
     def m1000(self, f: int, acquisition_name: str):
         """

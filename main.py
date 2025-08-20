@@ -1,16 +1,14 @@
-from actuator_xrl8.gcode_machine import GcodeMachine
+from actuator_xrl8.gcode_machine import NullGcodeMachine
 from actuator_xrl8.gcode_interpreter import GcodeInterpreter
 
 
 def main():
-    machine = GcodeMachine()
 
     while True:
         s = input()
+        interpreter = GcodeInterpreter(s, NullGcodeMachine())
 
-        interpreter = GcodeInterpreter(s, machine)
-
-        while status := interpreter.run():
+        while status := interpreter.step():
             if status is None:
                 print('Comando executado com sucesso')
             elif status is not True:

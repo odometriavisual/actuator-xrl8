@@ -21,7 +21,7 @@ class GcodeInterpreter:
         self._lexer = Lexer(gcode)
         self._machine = gcode_machine
 
-    def run(self):
+    def step(self):
         if self._lexer.available():
             tok = self._lexer.get_next_token()
 

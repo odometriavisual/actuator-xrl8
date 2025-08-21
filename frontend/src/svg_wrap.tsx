@@ -1,8 +1,16 @@
-import { useRef } from "preact/hooks";
+import { useRef, type Dispatch, type MutableRef, type StateUpdater } from "preact/hooks";
 
 import './svg_wrap.css'
+import type { Status, TrajetoriaNode } from "./app.tsx"
 
-export function SvgWrap({nodes, setNodes}: any) {
+type SvgWrapArgs = {
+  nodes: Array<TrajetoriaNode>,
+  setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
+  is_dirty: MutableRef<boolean>,
+  status: Status,
+}
+
+export function SvgWrap({ nodes, setNodes, is_dirty, status }: SvgWrapArgs) {
   const dragInfo = useRef<any>(null);
   const x0 = 0;
   const y0 = 0;
@@ -22,7 +30,7 @@ export function SvgWrap({nodes, setNodes}: any) {
     );
   }
 
-  function getSvgPoint(e: PointerEvent): { x: number, y: number} {
+  function getSvgPoint(e: PointerEvent): { x: number, y: number } {
     const svg = (e.target as SVGAElement).ownerSVGElement;
     if (svg) {
       const pt = svg.createSVGPoint();
@@ -35,7 +43,7 @@ export function SvgWrap({nodes, setNodes}: any) {
     return { x: 0, y: 0 }
   }
 
-  const onPointerDown = (e: PointerEvent, i: string | number) => {
+  const onPointerDown = (e: PointerEvent, i: number) => {
     const pt = getSvgPoint(e);
     dragInfo.current = {
       i,
@@ -47,13 +55,14 @@ export function SvgWrap({nodes, setNodes}: any) {
 
   const onPointerMove = (e: PointerEvent) => {
     if (!dragInfo.current) return;
-    const {i, offsetX, offsetY} = dragInfo.current;
+    const { i, offsetX, offsetY } = dragInfo.current;
     const pt = getSvgPoint(e);
-    const nx = Math.max(Math.min(Math.round((pt.x + offsetX)*5)/5, x0+width), x0);
-    const ny = Math.max(Math.min(Math.round((pt.y + offsetY)*5)/5, y0+height), y0);
+    const nx = Math.max(Math.min(Math.round((pt.x + offsetX) * 5) / 5, x0 + width), x0);
+    const ny = Math.max(Math.min(Math.round((pt.y + offsetY) * 5) / 5, y0 + height), y0);
     setNodes((ns: any) => {
       const copy = [...ns];
-      copy[i] = {...copy[i], x: nx, y: ny};
+      copy[i] = { ...copy[i], x: nx, y: ny };
+      is_dirty.current = true;
       return copy;
     });
   };
@@ -63,36 +72,43 @@ export function SvgWrap({nodes, setNodes}: any) {
   };
 
   return (
-      <div class="svg-wrap">
-        <svg viewBox={`${x0} ${y0} ${width} ${height}`} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
-          <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
-              <path d="M0,0 L5,2.5 L0,5 z" fill="#cccccc" />
-            </marker>
-            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-              <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.12"/>
-            </filter>
-          </defs>
-          <g>
-            {nodes.map((n: any, i: number) => (
-              <g key={n.id} onPointerDown={e => onPointerDown(e, i)}>
-                <circle cx={n.x} cy={n.y} r={5}
-                  fill={"#444444"}
-                  stroke="#fff"
-                  stroke-width="1"
-                  filter="url(#shadow)"
-                  style="cursor:grab" />
-              </g>
-            ))}
-          </g>
-          <g>
-            {nodes.map((n: any, i: number) => {
-              if (i == 0) return null;
-              const prev = nodes[i - 1];
-              return make_arrow(prev, n, 5);
-            })}
-          </g>
-        </svg>
-      </div>
-    );
+    <div class="svg-wrap">
+      <svg viewBox={`${x0} ${y0} ${width} ${height}`} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L5,2.5 L0,5 z" fill="#cccccc" />
+          </marker>
+          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.12" />
+          </filter>
+        </defs>
+        <g>
+          {nodes.map((n: any, i: number) => (
+            <g key={n.id} onPointerDown={e => onPointerDown(e, i)}>
+              <circle cx={n.x} cy={n.y} r={5}
+                fill={"#444444"}
+                stroke="#fff"
+                stroke-width="1"
+                filter="url(#shadow)"
+                style="cursor:grab" />
+            </g>
+          ))}
+        </g>
+        <g>
+          {nodes.map((n: any, i: number) => {
+            if (i == 0) return null;
+            const prev = nodes[i - 1];
+            return make_arrow(prev, n, 5);
+          })}
+        </g>
+        <g>
+          <circle style="pointer-events: none;" cx={status.pos[0]} cy={status.pos[1]} r={5}
+            fill={"#ff3322"}
+            stroke="#fff"
+            stroke-width="1"
+            filter="url(#shadow)" />
+        </g>
+      </svg>
+    </div>
+  );
 }

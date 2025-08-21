@@ -1,13 +1,19 @@
-import { useMemo, useRef, useState } from 'preact/hooks'
+import { useRef, useState, type Dispatch, type MutableRef, type StateUpdater } from 'preact/hooks'
 
-import { io } from 'socket.io-client'
-
+import { socket } from './socket.tsx'
+import type { Status, TrajetoriaNode } from './app.tsx'
 import './trajetoria.css'
 
-export function Trajetoria({ nodes, setNodes }: any) {
+type TrajetoriaArgs = {
+  nodes: Array<TrajetoriaNode>,
+  setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
+  is_dirty: MutableRef<boolean>,
+  status: Status,
+}
+
+export function Trajetoria({ nodes, setNodes, is_dirty, status }: TrajetoriaArgs) {
   const [nextId, setNextId] = useState<number>(0);
   const rowDragIndex = useRef<number | null>(null);
-  const socket = useMemo<any>(() => io(), []);
 
   function addNode(e: Event) {
     e.preventDefault();
@@ -20,30 +26,37 @@ export function Trajetoria({ nodes, setNodes }: any) {
       next.y = 50;
     }
 
-    setNodes([...nodes, next]);
+    setNodes(prev => {
+      is_dirty.current = true;
+      return [...prev, next];
+    });
     setNextId(id => id + 1);
   }
 
   function removeNode(e: Event, i: number) {
     e.preventDefault();
 
-    setNodes((prev: any) => {
+    setNodes(prev => {
       const next = [...prev];
       next.splice(i, 1);
+
+      is_dirty.current = true;
       return next;
     })
   }
 
   function updateNode(i: number, node: any) {
-    setNodes((prev: any) => {
+    setNodes(prev => {
       let nodes = [...prev];
       nodes[i] = { ...node }
+
+      is_dirty.current = true;
       return nodes;
     });
   }
 
-  function generateGcode() {
-    const gcode = nodes.map((n: any, i: number) => {
+  function send_gcode() {
+    const gcode = nodes.map((n, i) => {
       if (i == 0) {
         return `G28\nG0 X${n.x} Y${n.y}`;
       }
@@ -52,9 +65,39 @@ export function Trajetoria({ nodes, setNodes }: any) {
     }).join('\n');
 
     socket.emit("gcode", gcode)
+    is_dirty.current = false;
+  }
+
+  function home() {
+    socket.emit("gcode", "G28")
+    socket.emit("play")
+    is_dirty.current = true;
+  }
+
+  function toggle_play_pause() {
+    if (status.running) {
+      socket.emit("pause");
+    }
+    else {
+      if (is_dirty.current) {
+        alert('A trajetória foi alterada. Começando nova trajetória...')
+        send_gcode();
+      }
+      else if (!status.gcode_loaded) {
+        send_gcode();
+      }
+      socket.emit("play");
+    }
   }
 
   function step() {
+    if (is_dirty.current) {
+      alert('A trajetória foi alterada. Começando nova trajetória...')
+      send_gcode();
+    }
+    else if (!status.gcode_loaded) {
+      send_gcode();
+    }
     socket.emit("step")
   }
 
@@ -105,7 +148,7 @@ export function Trajetoria({ nodes, setNodes }: any) {
                   # </th>
                 <th> <input type="number" step="0.2" value={n.x} onInput={(e: any) => updateNode(i, { ...n, x: parseFloat(e.target.value) })} /> </th>
                 <th> <input type="number" step="0.2" value={n.y} onInput={(e: any) => updateNode(i, { ...n, y: parseFloat(e.target.value) })} /> </th>
-                {i === nodes.length-1?
+                {i === nodes.length - 1 ?
                   <th> <input disabled type="text" value="N/A" /></th> :
                   <th> <input type="number" step="1" value={n.s} onInput={(e: any) => updateNode(i, { ...n, s: parseFloat(e.target.value) })} /> </th>
                 }
@@ -122,10 +165,9 @@ export function Trajetoria({ nodes, setNodes }: any) {
         </tbody>
       </table>
       <button onClick={addNode}> + </button>
+      <button onClick={toggle_play_pause}> Pause/Play </button>
       <button onClick={step}> Step </button>
-      <button onClick={() => alert('not implemented')}> Pause/Play </button>
-      <button onClick={() => alert('not implemented')}> Stop </button>
-      <button onClick={generateGcode}> Start </button>
+      <button onClick={home}> Home </button>
     </div>
   )
 }

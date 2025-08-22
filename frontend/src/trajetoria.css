@@ -33,7 +33,7 @@ select {
 }
 
 .controls button:last-child,
-button:first-child {
+.controls button:first-child {
   grid-area: auto / auto / span 1 / span 3;
 }
 

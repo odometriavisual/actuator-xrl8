@@ -5,6 +5,7 @@ import { Trajetoria } from './trajetoria.tsx';
 
 import './app.css'
 import { socket } from './socket.tsx';
+import { Manual } from './manual.tsx';
 
 export type TrajetoriaNode = { id: number, x: number, y: number, s: number, command: number };
 export type Status = {
@@ -46,7 +47,7 @@ export function App() {
 
   return (
     <div class="wrap">
-      {connected ? null :
+      {connected? null :
         <div class="modal-wrap">
           <div class="modal-connect">
             <span>Erro ao conectar-se com o atuador, tentando novamente...</span>
@@ -58,10 +59,13 @@ export function App() {
         <div class="panel">
           <div class="tabs">
             <div class={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </div>
-            <div class={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle </div>
+            <div class={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </div>
           </div>
-          {tab == 0 ?
+          {
+          tab == 0 ?
             <Trajetoria nodes={nodes} setNodes={setNodes} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} /> :
+          tab == 1 ?
+            <Manual status={status} />:
             null
           }
         </div>

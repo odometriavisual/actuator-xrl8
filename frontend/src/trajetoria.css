@@ -25,3 +25,18 @@ td {
 select {
   width: 100%;
 }
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.controls button:last-child,
+button:first-child {
+  grid-area: auto / auto / span 1 / span 3;
+}
+
+.controls button {
+  height: 82px;
+}

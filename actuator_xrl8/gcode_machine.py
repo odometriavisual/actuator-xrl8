@@ -9,6 +9,10 @@ from actuator_xrl8 import virtual_encoder_api as encoder
 class NullGcodeMachine:
     def __init__(self):
         self.pos = np.array([0, 0], dtype=float)
+        self.calibrated = False
+
+    def is_calibrated(self):
+        return self.calibrated
 
     def get_position(self) -> (float, float):
         return tuple(self.pos)
@@ -31,21 +35,22 @@ class NullGcodeMachine:
         start = self.pos.copy()
         end = np.array([x, y])
         for i in range(30):
-            self.pos = (start * (29-i) + end * i)/29
-            sleep(1/30)
+            self.pos = (start * (29 - i) + end * i) / 29
+            sleep(1 / 30)
 
     def g4(self, p: int):
         """
         Dwell. Stops for p millisecons.
         """
         print(f"Recebido comando g4: {p = }")
-        sleep(p/1000)
+        sleep(p / 1000)
 
     def g28(self):
         """
         Auto home. Finds home position by moving to the endstops.
         """
-        print(f"Recebido comando g28")
+        print("Recebido comando g28")
+        self.calibrated = True
         self.g1(0, 0, 10)
 
     def g90(self):

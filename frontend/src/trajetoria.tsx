@@ -9,13 +9,15 @@ type TrajetoriaArgs = {
   setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
   is_dirty: MutableRef<boolean>,
   status: Status,
+  offset: { x: number, y: number },
+  setOffset: Dispatch<StateUpdater<{ x: number, y: number }>>,
 }
 
-export function Trajetoria({ nodes, setNodes, is_dirty, status }: TrajetoriaArgs) {
+export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffset }: TrajetoriaArgs) {
   const [nextId, setNextId] = useState<number>(0);
   const rowDragIndex = useRef<number | null>(null);
 
-  function addNode(e: Event) {
+  function add_node(e: Event) {
     e.preventDefault();
     const last = nodes[nodes.length - 1] || { x: 40, y: 10 };
 
@@ -33,7 +35,7 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status }: TrajetoriaArgs
     setNextId(id => id + 1);
   }
 
-  function removeNode(e: Event, i: number) {
+  function remove_node(e: Event, i: number) {
     e.preventDefault();
 
     setNodes(prev => {
@@ -45,7 +47,7 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status }: TrajetoriaArgs
     })
   }
 
-  function updateNode(i: number, node: any) {
+  function update_node(i: number, node: any) {
     setNodes(prev => {
       let nodes = [...prev];
       nodes[i] = { ...node }
@@ -55,13 +57,16 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status }: TrajetoriaArgs
     });
   }
 
-  function send_gcode() {
+  function send_trajetoria() {
     const gcode = nodes.map((n, i) => {
+      const x = n.x + offset.x;
+      const y = n.y + offset.y;
+
       if (i == 0) {
-        return `G28\nG0 X${n.x} Y${n.y}`;
+        return `G0 X${x} Y${y}`;
       }
 
-      return `G1 X${n.x} Y${n.y} S${n.s}`;
+      return `G1 X${x} Y${y} S${n.s}`;
     }).join('\n');
 
     socket.emit("gcode", gcode)
@@ -79,25 +84,11 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status }: TrajetoriaArgs
       socket.emit("pause");
     }
     else {
-      if (is_dirty.current) {
-        alert('A trajetória foi alterada. Começando nova trajetória...')
-        send_gcode();
-      }
-      else if (!status.gcode_loaded) {
-        send_gcode();
-      }
       socket.emit("play");
     }
   }
 
   function step() {
-    if (is_dirty.current) {
-      alert('A trajetória foi alterada. Começando nova trajetória...')
-      send_gcode();
-    }
-    else if (!status.gcode_loaded) {
-      send_gcode();
-    }
     socket.emit("step")
   }
 
@@ -127,47 +118,68 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status }: TrajetoriaArgs
   }
 
   return (
-    <div class="trajetoria">
+    <>
       <table>
         <thead>
           <tr>
-            <th>  </th>
-            <th> X </th>
-            <th> Y </th>
-            <th> Velocidade </th>
+            <th> Offset X </th>
+            <th> Offset Y </th>
           </tr>
         </thead>
         <tbody>
-          {
-            nodes.map((n: any, i: number) => (
-              <tr key={n.id}>
-                <th draggable={true}
-                  onDragStart={e => onRowDragStart(e, i)}
-                  onDragOver={e => onRowDragOver(e, i)}
-                  onDrop={onRowDrop} >
-                  # </th>
-                <th> <input type="number" step="0.2" value={n.x} onInput={(e: any) => updateNode(i, { ...n, x: parseFloat(e.target.value) })} /> </th>
-                <th> <input type="number" step="0.2" value={n.y} onInput={(e: any) => updateNode(i, { ...n, y: parseFloat(e.target.value) })} /> </th>
-                {i === nodes.length - 1 ?
-                  <th> <input disabled type="text" value="N/A" /></th> :
-                  <th> <input type="number" step="1" value={n.s} onInput={(e: any) => updateNode(i, { ...n, s: parseFloat(e.target.value) })} /> </th>
-                }
-                <th onClick={e => removeNode(e, i)}> [X] </th>
-                <th>
-                  <select value={n.command} onInput={(e: any) => updateNode(i, { ...n, command: e.target.command })}>
-                    <option value="1"> Iniciar aquisição </option>
-                    <option value="2"> Parar aquisição </option>
-                  </select>
-                </th>
-              </tr>
-            ))
-          }
+          <tr>
+            <th> <input type="number" step="0.2" value={offset.x} onInput={(e: any) => setOffset({x: parseFloat(e.target.value), y: offset.y})} /> </th>
+            <th> <input type="number" step="0.2" value={offset.y} onInput={(e: any) => setOffset({x: offset.x, y: parseFloat(e.target.value)})} /> </th>
+          </tr>
         </tbody>
       </table>
-      <button onClick={addNode}> + </button>
-      <button onClick={toggle_play_pause}> Pause/Play </button>
-      <button onClick={step}> Step </button>
-      <button onClick={home}> Home </button>
-    </div>
+      <div class="trajetoria">
+        <table>
+          <thead>
+            <tr>
+              <th>  </th>
+              <th> X </th>
+              <th> Y </th>
+              <th> Velocidade </th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              nodes.map((n: any, i: number) => (
+                <tr key={n.id}>
+                  <th draggable={true}
+                    onDragStart={e => onRowDragStart(e, i)}
+                    onDragOver={e => onRowDragOver(e, i)}
+                    onDrop={onRowDrop} >
+                    # </th>
+                  <th> <input type="number" step="0.2" value={n.x} onInput={(e: any) => update_node(i, { ...n, x: parseFloat(e.target.value) })} /> </th>
+                  <th> <input type="number" step="0.2" value={n.y} onInput={(e: any) => update_node(i, { ...n, y: parseFloat(e.target.value) })} /> </th>
+                  {i === nodes.length - 1 ?
+                    <th> <input disabled type="text" value="N/A" /></th> :
+                    <th> <input type="number" step="1" value={n.s} onInput={(e: any) => update_node(i, { ...n, s: parseFloat(e.target.value) })} /> </th>
+                  }
+                  <th onClick={e => remove_node(e, i)}> [X] </th>
+                  <th>
+                    <select value={n.command} onInput={(e: any) => update_node(i, { ...n, command: e.target.command })}>
+                      <option value="1"> Iniciar aquisição </option>
+                      <option value="2"> Parar aquisição </option>
+                    </select>
+                  </th>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <div class="controls">
+          <button disabled={status.running} onClick={add_node} > + 1 </button>
+          <button disabled={!status.calibrated || status.running} onClick={send_trajetoria} > Preparar trajetória </button>
+          <button disabled={!status.calibrated || !status.gcode_loaded || is_dirty.current} onClick={toggle_play_pause}>
+            {status.running ? "Pause" : "Play"}
+          </button>
+          <button disabled={!status.calibrated || !status.gcode_loaded || is_dirty.current || status.running} onClick={step}> Step </button>
+          <button disabled={status.running} onClick={home}> Calibrar Home </button>
+        </div>
+      </div>
+    </>
   )
 }

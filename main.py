@@ -15,6 +15,7 @@ def main():
     app.machine = NullGcodeMachine()
     app.interpreter = None
     app.running = False
+    app.was_pause_requested = True
 
     @app.route("/")
     def index():
@@ -22,7 +23,10 @@ def main():
 
     @ws.on("gcode")
     def gcode(gcode_src):
+        app.running = True
         app.interpreter = GcodeInterpreter(gcode_src, app.machine)
+        app.interpreter.step()
+        app.running = False
 
     @ws.on("step")
     def step():
@@ -40,24 +44,27 @@ def main():
         if app.interpreter is not None:
             app.running = True
 
-            while status := app.interpreter.step() and app.running:
+            while status := app.interpreter.step() and not app.was_pause_requested:
                 if status is not True:
                     print(f'erro: {status}')
 
             if app.interpreter.is_finished():
                 app.interpreter = None
+
             app.running = False
+            app.was_pause_requested = False
 
     @ws.on("pause")
     def pause():
-        app.running = False
+        app.was_pause_requested = True
 
     def send_status():
         while True:
             status = {
                 "running": app.running,
                 "gcode_loaded": app.interpreter is not None,
-                "pos": app.machine.get_position()
+                "pos": app.machine.get_position(),
+                "calibrated": app.machine.is_calibrated()
             }
             ws.emit("status", status)
             sleep(1/30)

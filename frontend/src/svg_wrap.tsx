@@ -8,9 +8,10 @@ type SvgWrapArgs = {
   setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
   is_dirty: MutableRef<boolean>,
   status: Status,
+  offset: { x: number, y: number },
 }
 
-export function SvgWrap({ nodes, setNodes, is_dirty, status }: SvgWrapArgs) {
+export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapArgs) {
   const dragInfo = useRef<any>(null);
   const x0 = 0;
   const y0 = 0;
@@ -24,7 +25,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status }: SvgWrapArgs) {
     const startX = a.x + ux * r, startY = a.y + uy * r;
     const endX = b.x - ux * r, endY = b.y - uy * r;
     return (
-      <line x1={startX} y1={startY} x2={endX} y2={endY}
+      <line style="pointer-events: none;" x1={startX} y1={startY} x2={endX} y2={endY}
         stroke="#cccccc" stroke-width="3" stroke-linecap="round"
         marker-end="url(#arrowhead)" opacity="0.95" />
     );
@@ -47,8 +48,8 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status }: SvgWrapArgs) {
     const pt = getSvgPoint(e);
     dragInfo.current = {
       i,
-      offsetX: nodes[i].x - pt.x,
-      offsetY: nodes[i].y - pt.y
+      offsetX: nodes[i].x + offset.x - pt.x,
+      offsetY: nodes[i].y + offset.y - pt.y
     };
     (e.target as Element).setPointerCapture(e.pointerId);
   };
@@ -57,8 +58,8 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status }: SvgWrapArgs) {
     if (!dragInfo.current) return;
     const { i, offsetX, offsetY } = dragInfo.current;
     const pt = getSvgPoint(e);
-    const nx = Math.max(Math.min(Math.round((pt.x + offsetX) * 5) / 5, x0 + width), x0);
-    const ny = Math.max(Math.min(Math.round((pt.y + offsetY) * 5) / 5, y0 + height), y0);
+    const nx = Math.max(Math.min(Math.round((pt.x + offsetX) * 5) / 5, x0 + width), x0) - offset.x;
+    const ny = Math.max(Math.min(Math.round((pt.y + offsetY) * 5) / 5, y0 + height), y0) - offset.y;
     setNodes((ns: any) => {
       const copy = [...ns];
       copy[i] = { ...copy[i], x: nx, y: ny };
@@ -85,7 +86,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status }: SvgWrapArgs) {
         <g>
           {nodes.map((n: any, i: number) => (
             <g key={n.id} onPointerDown={e => onPointerDown(e, i)}>
-              <circle cx={n.x} cy={n.y} r={5}
+              <circle cx={n.x + offset.x} cy={n.y + offset.y} r={5}
                 fill={"#444444"}
                 stroke="#fff"
                 stroke-width="1"
@@ -98,16 +99,19 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status }: SvgWrapArgs) {
           {nodes.map((n: any, i: number) => {
             if (i == 0) return null;
             const prev = nodes[i - 1];
-            return make_arrow(prev, n, 5);
+            return make_arrow({ ...prev, x: prev.x + offset.x, y: prev.y + offset.y }, { ...n, x: n.x + offset.x, y: n.y + offset.y }, 5);
           })}
         </g>
-        <g>
-          <circle style="pointer-events: none;" cx={status.pos[0]} cy={status.pos[1]} r={5}
-            fill={"#ff3322"}
-            stroke="#fff"
-            stroke-width="1"
-            filter="url(#shadow)" />
-        </g>
+        {status.calibrated ?
+          <g>
+            <circle style="pointer-events: none;" cx={status.pos[0]} cy={status.pos[1]} r={5}
+              fill={"#ff3322"}
+              stroke="#fff"
+              stroke-width="1"
+              filter="url(#shadow)" />
+          </g>
+          : null
+        }
       </svg>
     </div>
   );

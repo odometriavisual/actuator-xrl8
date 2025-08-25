@@ -24,7 +24,8 @@ DEFAULT_INTERVAL = 0.0005  # Default step interval
 
 
 class MotorGcodeMachine(NullGcodeMachine):
-    def __init__(self, accelerate=0.1, max_position=130000, min_position=-130000):
+    def __init__(self, accelerate=0.1, max_position=130000*80, min_position=-130000*80):
+        super().__init__()
         GPIO.setwarnings(False)
         GPIO.cleanup()
 
@@ -77,7 +78,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         self.ramp_steps_y = 0
 
     def g0(self, x, y):
-        self.g1(x, y, 1)
+        self.g1(x, y, 50)
 
     def g1(self, x, y, s):
         dx = x - self.curr_position_x
@@ -93,8 +94,12 @@ class MotorGcodeMachine(NullGcodeMachine):
         self.move(speed_x, x, speed_y, y)
 
     def g28(self):
-        self.move(0, 0, 7000, -30000)
-        self.move(7000, -30000, 0, 0)
+        self.move(0, 0, 50, -30000)
+        self.move(50, -30000, 0, 0)
+        self.calibrated = True
+        self.curr_position_x = 0
+        self.curr_position_y = 0
+        self.pos = np.array([0, 0], dtype=float)
 
     def move(self, speed_x, position_x, speed_y, position_y):
         position_x *= -80
@@ -219,6 +224,7 @@ class MotorGcodeMachine(NullGcodeMachine):
                 if GPIO.input(STEP_PIN_X):
                     self.curr_position_x += dir_x
                     steps_remaining_x -= 1
+                    self.pos[0] = -self.curr_position_x/80
 
                 steps_performed_x = total_steps_x - steps_remaining_x
 
@@ -259,6 +265,7 @@ class MotorGcodeMachine(NullGcodeMachine):
                 if GPIO.input(STEP_PIN_Y):
                     self.curr_position_y += dir_y
                     steps_remaining_y -= 1
+                    self.pos[1] = self.curr_position_y/80
 
                 steps_performed_y = total_steps_y - steps_remaining_y
 

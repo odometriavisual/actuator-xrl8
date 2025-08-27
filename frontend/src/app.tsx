@@ -47,7 +47,7 @@ export function App() {
 
   return (
     <div class="wrap">
-      {connected? null :
+      {false || connected? null :
         <div class="modal-wrap">
           <div class="modal-connect">
             <span>Erro ao conectar-se com o atuador, tentando novamente...</span>
@@ -57,9 +57,9 @@ export function App() {
       }
       <>
         <div class="panel">
-          <div class="tabs">
-            <div class={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </div>
-            <div class={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </div>
+          <div className="tabs">
+            <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
+            <button className={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </button>
           </div>
           {
           tab == 0 ?

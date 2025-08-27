@@ -26,7 +26,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
     const endX = b.x - ux * r, endY = b.y - uy * r;
     return (
       <line style="pointer-events: none;" x1={startX} y1={startY} x2={endX} y2={endY}
-        stroke="#cccccc" stroke-width="3" stroke-linecap="round"
+        stroke="var(--on-surface-alt-color)" stroke-width="2.5" stroke-linecap="round"
         marker-end="url(#arrowhead)" opacity="0.95" />
     );
   }
@@ -77,7 +77,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
       <svg viewBox={`${x0} ${y0} ${width} ${height}`} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L5,2.5 L0,5 z" fill="#cccccc" />
+            <path d="M0,0 L5,2.5 L0,5 z" fill="var(--on-surface-alt-color)" />
           </marker>
           <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
             <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.12" />
@@ -86,10 +86,8 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
         <g>
           {nodes.map((n: any, i: number) => (
             <g key={n.id} onPointerDown={e => onPointerDown(e, i)}>
-              <circle cx={n.x + offset.x} cy={n.y + offset.y} r={5}
-                fill={"#444444"}
-                stroke="#fff"
-                stroke-width="1"
+              <circle cx={n.x + offset.x} cy={n.y + offset.y} r={4.5}
+                fill="var(--on-surface-color)"
                 filter="url(#shadow)"
                 style="cursor:grab" />
             </g>
@@ -105,9 +103,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
         {status.calibrated ?
           <g>
             <circle style="pointer-events: none;" cx={status.pos[0]} cy={status.pos[1]} r={5}
-              fill={"#ff3322"}
-              stroke="#fff"
-              stroke-width="1"
+              fill="var(--warning-color)"
               filter="url(#shadow)" />
           </g>
           : null

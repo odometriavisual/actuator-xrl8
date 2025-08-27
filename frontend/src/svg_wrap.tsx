@@ -15,15 +15,18 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
   const dragInfo = useRef<any>(null);
   const x0 = 0;
   const y0 = 0;
-  const width = 800
-  const height = 600;
+  const width = 410;
+  const height = 335;
 
   function make_arrow(a: { x: number; y: number; }, b: { x: number; y: number; }, r: number) {
     const dx = b.x - a.x, dy = b.y - a.y;
     const d = Math.hypot(dx, dy) || 1;
-    const ux = dx / d, uy = dy / d;
-    const startX = a.x + ux * r, startY = a.y + uy * r;
-    const endX = b.x - ux * r, endY = b.y - uy * r;
+    const ux = dx / d;
+    const uy = dy / d;
+    const startX = a.x + ux * r;
+    const startY = a.y + uy * r;
+    const endX = b.x - ux * (r+2.5);
+    const endY = b.y - uy * (r+2.5);
     return (
       <line style="pointer-events: none;" x1={startX} y1={startY} x2={endX} y2={endY}
         stroke="var(--on-surface-alt-color)" stroke-width="2.5" stroke-linecap="round"
@@ -79,7 +82,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
           <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L5,2.5 L0,5 z" fill="var(--on-surface-alt-color)" />
           </marker>
-          <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <filter id="shadow" x="-50%" y="-50%" width="250%" height="250%">
             <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.12" />
           </filter>
         </defs>
@@ -97,7 +100,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
           {nodes.map((n: any, i: number) => {
             if (i == 0) return null;
             const prev = nodes[i - 1];
-            return make_arrow({ ...prev, x: prev.x + offset.x, y: prev.y + offset.y }, { ...n, x: n.x + offset.x, y: n.y + offset.y }, 5);
+            return make_arrow({ ...prev, x: prev.x + offset.x, y: prev.y + offset.y }, { ...n, x: n.x + offset.x, y: n.y + offset.y }, 4.5);
           })}
         </g>
         {status.calibrated ?

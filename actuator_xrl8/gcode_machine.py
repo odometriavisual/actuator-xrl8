@@ -32,11 +32,12 @@ class NullGcodeMachine:
         Linear movement. Used when the acquire is enabled.
         """
         print(f"Recebido comando g1: {x = } {y = } {s = }")
-        start = self.pos.copy()
         end = np.array([x, y])
-        for i in range(30):
-            self.pos = (start * (29 - i) + end * i) / 29
-            sleep(1 / 30)
+        dir = end - self.pos
+        dir /= np.linalg.norm(dir)
+        while np.linalg.norm(end-self.pos) > 1:
+            self.pos += dir
+            sleep(1/s)
 
     def g4(self, p: int):
         """

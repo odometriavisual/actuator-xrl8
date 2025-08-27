@@ -4,7 +4,11 @@ from flask_socketio import SocketIO
 from threading import Thread
 from time import sleep
 
-from actuator_xrl8.motor import MotorGcodeMachine
+try:
+    from actuator_xrl8.motor import MotorGcodeMachine as GcodeMachine
+except RuntimeError:
+    from actuator_xrl8.gcode_machine import NullGcodeMachine as GcodeMachine
+
 from actuator_xrl8.gcode_interpreter import GcodeInterpreter
 
 
@@ -12,7 +16,7 @@ def main():
     app = Flask(__name__, static_url_path="/assets", static_folder="./frontend/dist/assets")
     ws = SocketIO(app, cors_allowed_origins="*")
 
-    app.machine = MotorGcodeMachine()
+    app.machine = GcodeMachine()
     app.interpreter = None
     app.running = False
     app.was_pause_requested = True

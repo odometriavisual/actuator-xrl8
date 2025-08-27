@@ -47,7 +47,7 @@ export function App() {
 
   return (
     <div class="wrap">
-      {false || connected? null :
+      {connected? null :
         <div class="modal-wrap">
           <div class="modal-connect">
             <span>Erro ao conectar-se com o atuador, tentando novamente...</span>

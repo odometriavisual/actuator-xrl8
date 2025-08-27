@@ -19,9 +19,9 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
 
   function add_node(e: Event) {
     e.preventDefault();
-    const last = nodes[nodes.length - 1] || { x: 40, y: 10 };
+    const last = nodes[nodes.length - 1] || { x: 40, y: 10, s: 50 };
 
-    let next = { id: nextId, x: last.x + 10, y: last.y + 40, s: 1, command: 0 }
+    let next = { id: nextId, x: last.x + 10, y: last.y + 40, s: last.s, command: 0 }
 
     if (next.y > 550) {
       next.x += 40;
@@ -154,7 +154,7 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
                     # </th>
                   <th> <input type="number" step="0.2" value={n.x} onInput={(e: any) => update_node(i, { ...n, x: parseFloat(e.target.value) })} /> </th>
                   <th> <input type="number" step="0.2" value={n.y} onInput={(e: any) => update_node(i, { ...n, y: parseFloat(e.target.value) })} /> </th>
-                  {i === nodes.length - 1 ?
+                  {i === 0 ?
                     <th> <input disabled type="text" value="N/A" /></th> :
                     <th> <input type="number" step="1" value={n.s} onInput={(e: any) => update_node(i, { ...n, s: parseFloat(e.target.value) })} /> </th>
                   }

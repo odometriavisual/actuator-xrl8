@@ -133,7 +133,7 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
           </tr>
         </tbody>
       </table>
-      <div class="trajetoria">
+      <div className="trajetoria">
         <table>
           <thead>
             <tr>
@@ -170,14 +170,14 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
             }
           </tbody>
         </table>
-        <div class="controls">
+        <div className="controls">
           <button disabled={status.running} onClick={add_node} > + 1 </button>
-          <button disabled={!status.calibrated || status.running} onClick={send_trajetoria} > Preparar trajetória </button>
-          <button disabled={!status.calibrated || !status.gcode_loaded || is_dirty.current} onClick={toggle_play_pause}>
+          <button disabled={!status.connected || !status.calibrated || status.running} onClick={send_trajetoria} > Preparar trajetória </button>
+          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current} onClick={toggle_play_pause}>
             {status.running ? "Pause" : "Play"}
           </button>
-          <button disabled={!status.calibrated || !status.gcode_loaded || is_dirty.current || status.running} onClick={step}> Step </button>
-          <button disabled={status.running} onClick={home}> Calibrar Home </button>
+          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current || status.running} onClick={step}> Step </button>
+          <button disabled={!status.connected || status.running} onClick={home}> Calibrar Home </button>
         </div>
       </div>
     </>

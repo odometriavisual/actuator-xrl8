@@ -76,7 +76,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
   };
 
   return (
-    <div class="svg-wrap">
+    <div className="svg-wrap">
       <svg viewBox={`${x0} ${y0} ${width} ${height}`} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">

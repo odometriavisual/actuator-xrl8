@@ -40,14 +40,14 @@ export function Manual({ status }: ManualParams) {
 
   return (
     <>
-      <div class="manual-wrap">
-        <button disabled={!status.calibrated || status.running} onClick={left}> ^ </button>
-        <button disabled={!status.calibrated || status.running} onClick={up}> {"<"} </button>
-        <button disabled={status.running} onClick={home}> HOME </button>
-        <button disabled={!status.calibrated || status.running} onClick={right}> {">"} </button>
-        <button disabled={!status.calibrated || status.running} onClick={down}> V </button>
+      <div className="manual-wrap">
+        <button disabled={!status.connected || !status.calibrated || status.running} onClick={left}> ^ </button>
+        <button disabled={!status.connected || !status.calibrated || status.running} onClick={up}> {"<"} </button>
+        <button disabled={!status.connected || status.running} onClick={home}> HOME </button>
+        <button disabled={!status.connected || !status.calibrated || status.running} onClick={right}> {">"} </button>
+        <button disabled={!status.connected || !status.calibrated || status.running} onClick={down}> V </button>
       </div>
-      <fieldset class="manual-controls">
+      <fieldset className="manual-controls">
         <div>
           <input type="radio" id="1" name="step-size" value="1" checked={stepSize === 1} onClick={() => setStepSize(1)} />
           <label for="1">x1</label>

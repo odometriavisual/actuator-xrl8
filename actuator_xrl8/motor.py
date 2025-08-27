@@ -81,8 +81,8 @@ class MotorGcodeMachine(NullGcodeMachine):
         self.g1(x, y, 50)
 
     def g1(self, x, y, s):
-        dx = x - self.curr_position_x
-        dy = y - self.curr_position_y
+        dx = x - self.curr_position_x/-80
+        dy = y - self.curr_position_y/80
         position = math.sqrt(dx**2 + dy**2)
 
         if position == 0:

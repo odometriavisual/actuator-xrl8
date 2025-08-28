@@ -16,12 +16,26 @@ export type Status = {
   calibrated: boolean,
 }
 
+export type Bounds = {
+  x0: number,
+  y0: number,
+  width: number,
+  height: number
+}
+
 export function App() {
   const [tab, setTab] = useState<number>(0);
 
   const [nodes, setNodes] = useState<Array<TrajetoriaNode>>([]);
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const is_dirty = useRef<boolean>(true);
+
+  const bounds = {
+    x0: 0,
+    y0: 0,
+    width: 410,
+    height: 335,
+  };
 
   const [status, setStatus] = useState<Status>({
     connected: false,
@@ -58,13 +72,13 @@ export function App() {
           </div>
         {
           tab == 0 ?
-            <Trajetoria nodes={nodes} setNodes={setNodes} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} /> :
+            <Trajetoria nodes={nodes} setNodes={setNodes} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
             tab == 1 ?
               <Manual status={status} /> :
               null
         }
       </div>
-      <SvgWrap nodes={nodes} setNodes={setNodes} is_dirty={is_dirty} status={status} offset={offset} />
+      <SvgWrap nodes={nodes} setNodes={setNodes} is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useRef, type Dispatch, type MutableRef, type StateUpdater } from "preact/hooks";
 
 import './svg_wrap.css'
-import type { Status, TrajetoriaNode } from "./app.tsx"
+import type { Bounds, Status, TrajetoriaNode } from "./app.tsx"
 
 type SvgWrapArgs = {
   nodes: Array<TrajetoriaNode>,
@@ -9,14 +9,11 @@ type SvgWrapArgs = {
   is_dirty: MutableRef<boolean>,
   status: Status,
   offset: { x: number, y: number },
+  bounds: Bounds,
 }
 
-export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapArgs) {
+export function SvgWrap({ nodes, setNodes, is_dirty, status, offset, bounds }: SvgWrapArgs) {
   const dragInfo = useRef<any>(null);
-  const x0 = 0;
-  const y0 = 0;
-  const width = 410;
-  const height = 335;
 
   function make_arrow(a: { x: number; y: number; }, b: { x: number; y: number; }, r: number) {
     const dx = b.x - a.x, dy = b.y - a.y;
@@ -25,8 +22,8 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
     const uy = dy / d;
     const startX = a.x + ux * r;
     const startY = a.y + uy * r;
-    const endX = b.x - ux * (r+2.5);
-    const endY = b.y - uy * (r+2.5);
+    const endX = b.x - ux * (r + 2.5);
+    const endY = b.y - uy * (r + 2.5);
     return (
       <line style="pointer-events: none;" x1={startX} y1={startY} x2={endX} y2={endY}
         stroke="var(--on-surface-alt-color)" stroke-width="2.5" stroke-linecap="round"
@@ -61,8 +58,8 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
     if (!dragInfo.current) return;
     const { i, offsetX, offsetY } = dragInfo.current;
     const pt = getSvgPoint(e);
-    const nx = Math.max(Math.min(Math.round((pt.x + offsetX) * 5) / 5, x0 + width), x0) - offset.x;
-    const ny = Math.max(Math.min(Math.round((pt.y + offsetY) * 5) / 5, y0 + height), y0) - offset.y;
+    const nx = Math.max(Math.min(Math.round((pt.x + offsetX) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
+    const ny = Math.max(Math.min(Math.round((pt.y + offsetY) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
     setNodes((ns: any) => {
       const copy = [...ns];
       copy[i] = { ...copy[i], x: nx, y: ny };
@@ -77,7 +74,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset }: SvgWrapAr
 
   return (
     <div className="svg-wrap">
-      <svg viewBox={`${x0} ${y0} ${width} ${height}`} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
+      <svg viewBox={`${bounds.x0} ${bounds.y0} ${bounds.width} ${bounds.height}`} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L5,2.5 L0,5 z" fill="var(--on-surface-alt-color)" />

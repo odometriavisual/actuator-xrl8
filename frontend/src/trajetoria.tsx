@@ -1,7 +1,7 @@
 import { useRef, useState, type Dispatch, type MutableRef, type StateUpdater } from 'preact/hooks'
 
 import { socket } from './socket.tsx'
-import type { Status, TrajetoriaNode } from './app.tsx'
+import type { Bounds, Status, TrajetoriaNode } from './app.tsx'
 import './trajetoria.css'
 
 type TrajetoriaArgs = {
@@ -11,9 +11,10 @@ type TrajetoriaArgs = {
   status: Status,
   offset: { x: number, y: number },
   setOffset: Dispatch<StateUpdater<{ x: number, y: number }>>,
+  bounds: Bounds,
 }
 
-export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffset }: TrajetoriaArgs) {
+export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffset, bounds }: TrajetoriaArgs) {
   const [nextId, setNextId] = useState<number>(0);
   const rowDragIndex = useRef<number | null>(null);
 
@@ -23,9 +24,12 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
 
     let next = { id: nextId, x: last.x + 10, y: last.y + 40, s: last.s, command: 0 }
 
-    if (next.y > 550) {
+    if (next.y > bounds.height - 50) {
       next.x += 40;
       next.y = 50;
+    }
+    if (next.x > bounds.width - 50) {
+      next.x = 50;
     }
 
     setNodes(prev => {
@@ -51,6 +55,9 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
     setNodes(prev => {
       let nodes = [...prev];
       nodes[i] = { ...node }
+
+      nodes[i].x = Math.max(Math.min(Math.round((nodes[i].x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
+      nodes[i].y = Math.max(Math.min(Math.round((nodes[i].y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
 
       is_dirty.current = true;
       return nodes;

@@ -1,7 +1,9 @@
 import { useState } from 'preact/hooks';
+import "bootstrap-icons/font/bootstrap-icons.css"
+
+import { socket } from './socket';
 import type { Status } from './app';
 import './manual.css'
-import { socket } from './socket';
 
 type ManualParams = {
   status: Status
@@ -43,7 +45,7 @@ export function Manual({ status }: ManualParams) {
       <div className="manual-wrap">
         <button disabled={!status.connected || !status.calibrated || status.running} onClick={left}> ^ </button>
         <button disabled={!status.connected || !status.calibrated || status.running} onClick={up}> {"<"} </button>
-        <button disabled={!status.connected || status.running} onClick={home}> HOME </button>
+        <button disabled={!status.connected || status.running} onClick={home}> <i class="home bi bi-house-fill"></i> </button>
         <button disabled={!status.connected || !status.calibrated || status.running} onClick={right}> {">"} </button>
         <button disabled={!status.connected || !status.calibrated || status.running} onClick={down}> V </button>
       </div>

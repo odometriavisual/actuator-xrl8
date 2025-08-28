@@ -26,6 +26,22 @@ select {
   width: 100%;
 }
 
+.trajetoria .mv-node {
+  cursor: grab;
+  border-radius: 4px;
+}
+
+.trajetoria .mv-node:hover,
+.trajetoria .mv-node:focus {
+  color: var(--on-primary-color);
+  background-color: var(--primary-color)
+}
+
+.trajetoria .rm-node {
+  cursor: pointer;
+  color: var(--warning-color);
+}
+
 .controls {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

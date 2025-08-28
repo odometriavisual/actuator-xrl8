@@ -44,3 +44,7 @@
 .manual-controls>fieldset {
   border: none;
 }
+
+.manual-wrap .home {
+  font-size: 3em;
+}

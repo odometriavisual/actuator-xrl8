@@ -1,4 +1,5 @@
 import { useRef, useState, type Dispatch, type MutableRef, type StateUpdater } from 'preact/hooks'
+import "bootstrap-icons/font/bootstrap-icons.css"
 
 import { socket } from './socket.tsx'
 import type { Bounds, Status, TrajetoriaNode } from './app.tsx'
@@ -135,8 +136,8 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
         </thead>
         <tbody>
           <tr>
-            <th> <input type="number" step="0.2" value={offset.x} onInput={(e: any) => setOffset({x: parseFloat(e.target.value), y: offset.y})} /> </th>
-            <th> <input type="number" step="0.2" value={offset.y} onInput={(e: any) => setOffset({x: offset.x, y: parseFloat(e.target.value)})} /> </th>
+            <th> <input type="number" step="0.2" value={offset.x} onInput={(e: any) => setOffset({ x: parseFloat(e.target.value), y: offset.y })} /> </th>
+            <th> <input type="number" step="0.2" value={offset.y} onInput={(e: any) => setOffset({ x: offset.x, y: parseFloat(e.target.value) })} /> </th>
           </tr>
         </tbody>
       </table>
@@ -158,14 +159,19 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
                     onDragStart={e => onRowDragStart(e, i)}
                     onDragOver={e => onRowDragOver(e, i)}
                     onDrop={onRowDrop} >
-                    # </th>
+                    <i class="mv-node bi bi-list"></i>
+                  </th>
                   <th> <input type="number" step="0.2" value={n.x} onInput={(e: any) => update_node(i, { ...n, x: parseFloat(e.target.value) })} /> </th>
                   <th> <input type="number" step="0.2" value={n.y} onInput={(e: any) => update_node(i, { ...n, y: parseFloat(e.target.value) })} /> </th>
                   {i === 0 ?
                     <th> <input disabled type="text" value="N/A" /></th> :
                     <th> <input type="number" step="1" value={n.s} onInput={(e: any) => update_node(i, { ...n, s: parseFloat(e.target.value) })} /> </th>
                   }
-                  <th onClick={e => remove_node(e, i)}> [X] </th>
+                  <th onClick={e => remove_node(e, i)}>
+                    <i class="rm-node bi bi-x-circle"
+                      onMouseEnter={ev => (ev.target as Element).classList.replace('bi-x-circle', 'bi-x-circle-fill')}
+                      onMouseLeave={ev => (ev.target as Element).classList.replace('bi-x-circle-fill', 'bi-x-circle')}></i>
+                  </th>
                   <th>
                     <select value={n.command} onInput={(e: any) => update_node(i, { ...n, command: e.target.command })}>
                       <option value="1"> Iniciar aquisição </option>
@@ -181,10 +187,18 @@ export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffse
           <button disabled={status.running} onClick={add_node} > + 1 </button>
           <button disabled={!status.connected || !status.calibrated || status.running} onClick={send_trajetoria} > Preparar trajetória </button>
           <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current} onClick={toggle_play_pause}>
-            {status.running ? "Pause" : "Play"}
+            {status.running ?
+              <span><i class="bi bi-pause-circle"></i> Pause</span> :
+              <span><i class="bi bi-play-circle"></i> Play</span>}
           </button>
-          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current || status.running} onClick={step}> Step </button>
-          <button disabled={!status.connected || status.running} onClick={home}> Calibrar Home </button>
+          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current || status.running} onClick={step}>
+            <i class="bi bi-arrow-bar-right"></i> Step
+          </button>
+          <button disabled={!status.connected || status.running} onClick={home}>
+            <span>
+              <i class="bi bi-house-fill"></i> Calibrar Home
+            </span>
+          </button>
         </div>
       </div>
     </>

@@ -1,4 +1,4 @@
-import { useRef, useState, type Dispatch, type MutableRef, type StateUpdater } from 'preact/hooks'
+import { useRef, type Dispatch, type MutableRef, type StateUpdater } from 'preact/hooks'
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 import { socket } from './socket.tsx'
@@ -8,6 +8,8 @@ import './trajetoria.css'
 type TrajetoriaArgs = {
   nodes: Array<TrajetoriaNode>,
   setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
+  nextId: number,
+  setNextId: Dispatch<StateUpdater<number>>,
   is_dirty: MutableRef<boolean>,
   status: Status,
   offset: { x: number, y: number },
@@ -15,8 +17,7 @@ type TrajetoriaArgs = {
   bounds: Bounds,
 }
 
-export function Trajetoria({ nodes, setNodes, is_dirty, status, offset, setOffset, bounds }: TrajetoriaArgs) {
-  const [nextId, setNextId] = useState<number>(0);
+export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, status, offset, setOffset, bounds }: TrajetoriaArgs) {
   const rowDragIndex = useRef<number | null>(null);
 
   function add_node(e: Event) {

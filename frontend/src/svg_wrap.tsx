@@ -6,13 +6,15 @@ import type { Bounds, Status, TrajetoriaNode } from "./app.tsx"
 type SvgWrapArgs = {
   nodes: Array<TrajetoriaNode>,
   setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
+  nextId: number,
+  setNextId: Dispatch<StateUpdater<number>>,
   is_dirty: MutableRef<boolean>,
   status: Status,
   offset: { x: number, y: number },
   bounds: Bounds,
 }
 
-export function SvgWrap({ nodes, setNodes, is_dirty, status, offset, bounds }: SvgWrapArgs) {
+export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, offset, bounds }: SvgWrapArgs) {
   const dragInfo = useRef<any>(null);
 
   function make_arrow(a: { x: number; y: number; }, b: { x: number; y: number; }, r: number) {
@@ -31,8 +33,8 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset, bounds }: S
     );
   }
 
-  function getSvgPoint(e: PointerEvent): { x: number, y: number } {
-    const svg = (e.target as SVGAElement).ownerSVGElement;
+  function getSvgPoint(e: MouseEvent): { x: number, y: number } {
+    const svg = (e.target as SVGAElement).ownerSVGElement || (e.target as SVGSVGElement);
     if (svg) {
       const pt = svg.createSVGPoint();
       pt.x = e.clientX;
@@ -43,6 +45,22 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset, bounds }: S
     }
     return { x: 0, y: 0 }
   }
+
+  const onDoubleClick = (e: MouseEvent) => {
+    const pt = getSvgPoint(e);
+    const last = nodes[nodes.length - 1] || { s: 50 };
+    const nx = Math.max(Math.min(Math.round((pt.x - offset.x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
+    const ny = Math.max(Math.min(Math.round((pt.y - offset.y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
+
+    let next = { id: nextId, x: nx, y: ny, s: last.s, command: 0 }
+
+    setNodes(prev => {
+      is_dirty.current = true;
+      return [...prev, next];
+    });
+    setNextId(id => id + 1);
+  };
+
 
   const onPointerDown = (e: PointerEvent, i: number) => {
     const pt = getSvgPoint(e);
@@ -74,7 +92,7 @@ export function SvgWrap({ nodes, setNodes, is_dirty, status, offset, bounds }: S
 
   return (
     <div className="svg-wrap">
-      <svg viewBox={`${bounds.x0} ${bounds.y0} ${bounds.width} ${bounds.height}`} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
+      <svg viewBox={`${bounds.x0} ${bounds.y0} ${bounds.width} ${bounds.height}`} onDblClick={onDoubleClick} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L5,2.5 L0,5 z" fill="var(--on-surface-alt-color)" />

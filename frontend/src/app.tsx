@@ -27,6 +27,7 @@ export function App() {
   const [tab, setTab] = useState<number>(0);
 
   const [nodes, setNodes] = useState<Array<TrajetoriaNode>>([]);
+  const [nextId, setNextId] = useState<number>(0);
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const is_dirty = useRef<boolean>(true);
 
@@ -59,12 +60,6 @@ export function App() {
 
   return (
     <div className="wrap">
-      <div className={`toast-wrap${status.connected ? "" : " show"}`}>
-        <div className="toast-connect">
-          <span>Erro ao conectar-se com o atuador, tentando novamente...</span>
-          <div className="loader"></div>
-        </div>
-      </div>
       <div className="panel">
           <div className="tabs">
             <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
@@ -72,13 +67,13 @@ export function App() {
           </div>
         {
           tab == 0 ?
-            <Trajetoria nodes={nodes} setNodes={setNodes} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
+            <Trajetoria nodes={nodes} setNodes={setNodes} nextId={nextId} setNextId={setNextId} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
             tab == 1 ?
               <Manual status={status} /> :
               null
         }
       </div>
-      <SvgWrap nodes={nodes} setNodes={setNodes} is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />
+      <SvgWrap nodes={nodes} setNodes={setNodes} nextId={nextId} setNextId={setNextId} is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />
     </div>
   )
 }

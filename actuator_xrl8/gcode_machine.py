@@ -9,6 +9,7 @@ from actuator_xrl8 import virtual_encoder_api as encoder
 class NullGcodeMachine:
     def __init__(self):
         self.pos = np.array([0, 0], dtype=float)
+        self.pause_requested = False
         self.calibrated = False
 
     def is_calibrated(self):
@@ -19,27 +20,38 @@ class NullGcodeMachine:
         "Returns position in mm"
         return tuple(self.pos)
 
+    def pause(self):
+        self.pause_requested = True
+
     def _convert_mm_to_steps(self, a: NDArray):
         return (a * self.STEPS_PER_MM).astype(int)
 
-    def g0(self, x: float, y: float):
+    def g0(self, x: float, y: float) -> bool:
         """
         Fast linear movement. Used when the acquire is disabled.
         """
         print(f"Recebido comando g0: {x = } {y = }")
-        self.g1(x, y, 10)
+        return self.g1(x, y, 100)
 
-    def g1(self, x: float, y: float, s: float):
+    def g1(self, x: float, y: float, s: float) -> bool:
         """
         Linear movement. Used when the acquire is enabled.
+        Returns false if movement was not finished
+        Returns true if movement was finished
         """
         print(f"Recebido comando g1: {x = } {y = } {s = }")
         end = np.array([x, y])
         dir = end - self.pos
         dir /= np.linalg.norm(dir)
         while np.linalg.norm(end-self.pos) > 1:
+            if self.pause_requested:
+                self.pause_requested = False
+                return False
+
             self.pos += dir
             sleep(1/s)
+
+        return True
 
     def g4(self, p: int):
         """
@@ -48,13 +60,18 @@ class NullGcodeMachine:
         print(f"Recebido comando g4: {p = }")
         sleep(p / 1000)
 
-    def g28(self):
+    def g28(self) -> bool:
         """
         Auto home. Finds home position by moving to the endstops.
+        Returns false if calibration was not finished
+        Returns true if calibration was finished
         """
         print("Recebido comando g28")
-        self.calibrated = True
-        self.g1(0, 0, 10)
+        if self.g1(0, 0, 10):
+            self.calibrated = True
+            return True
+
+        return False
 
     def g90(self):
         """

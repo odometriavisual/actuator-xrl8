@@ -1,0 +1,14 @@
+[Unit]
+Description=Actuator XRL8
+After=multi-user.target
+
+[Service]
+Type=exec
+Restart=always
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/actuator-xrl8/
+ExecStart=/home/pi/actuator-xrl8/venv/bin/python /home/pi/actuator-xrl8/main.py
+
+[Install]
+WantedBy=multi-user.target

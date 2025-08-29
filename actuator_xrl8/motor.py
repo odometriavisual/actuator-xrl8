@@ -26,7 +26,7 @@ STEPS_PER_MM = 5 * 16
 
 class MotorGcodeMachine(NullGcodeMachine):
     def __init__(
-        self, accelerate=0.1, max_position=130000 * STEPS_PER_MM, min_position=-130000 * STEPS_PER_MM
+        self, accelerate=0.01, max_position=130000 * STEPS_PER_MM, min_position=-130000 * STEPS_PER_MM
     ):
         super().__init__()
         GPIO.setwarnings(False)
@@ -162,7 +162,7 @@ class MotorGcodeMachine(NullGcodeMachine):
             self.ramp_profile_down_y = np.ones(1)
 
         try:
-            self.__move(speed_x, position_x, speed_y, position_y)
+            self.__move(speed_x*2, position_x, speed_y*2, position_y)
         except Exception as e:
             print(f"Movement error: {e}")
             raise

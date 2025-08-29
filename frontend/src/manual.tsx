@@ -43,8 +43,8 @@ export function Manual({ status }: ManualParams) {
   return (
     <>
       <div className="manual-wrap">
-        <button disabled={!status.connected || !status.calibrated || status.running} onClick={left}> ^ </button>
-        <button disabled={!status.connected || !status.calibrated || status.running} onClick={up}> {"<"} </button>
+        <button disabled={!status.connected || !status.calibrated || status.running} onClick={up}> ^ </button>
+        <button disabled={!status.connected || !status.calibrated || status.running} onClick={left}> {"<"} </button>
         <button disabled={!status.connected || status.running} onClick={home}> <i class="home bi bi-house-fill"></i> </button>
         <button disabled={!status.connected || !status.calibrated || status.running} onClick={right}> {">"} </button>
         <button disabled={!status.connected || !status.calibrated || status.running} onClick={down}> V </button>

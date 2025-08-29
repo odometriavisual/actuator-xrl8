@@ -84,7 +84,6 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
 
   function home() {
     socket.emit("gcode", "G28")
-    socket.emit("play")
     is_dirty.current = true;
   }
 

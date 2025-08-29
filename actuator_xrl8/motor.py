@@ -88,28 +88,46 @@ class MotorGcodeMachine(NullGcodeMachine):
         "Returns position in mm"
         return (-self.curr_position_x / STEPS_PER_MM, self.curr_position_y / STEPS_PER_MM)
 
-    def g0(self, x, y):
-        self.g1(x, y, 50)
+    def g0(self, x, y) -> bool:
+        """
+        Fast linear movement. Used when the acquire is disabled.
+        Returns false if movement was not finished
+        Returns true if movement was finished
+        """
+        return self.g1(x, y, 50)
 
-    def g1(self, x, y, s):
+    def g1(self, x, y, s) -> bool:
+        """
+        Linear movement. Used when the acquire is enabled.
+        Returns false if movement was not finished
+        Returns true if movement was finished
+        """
         dx = x - self.curr_position_x / -STEPS_PER_MM
         dy = y - self.curr_position_y / STEPS_PER_MM
         position = math.sqrt(dx**2 + dy**2)
 
         if position == 0:
-            return
+            return True
 
         speed_x = (abs(dx) / position) * s
         speed_y = (abs(dy) / position) * s
 
-        self.move(speed_x, x, speed_y, y)
+        return self.move(speed_x, x, speed_y, y)
 
-    def g28(self):
-        self.move(0, 0, 50, -30000)
-        self.move(50, -30000, 0, 0)
-        self.calibrated = True
-        self.curr_position_x = 0
-        self.curr_position_y = 0
+    def g28(self) -> bool:
+        """
+        Auto home. Finds home position by moving to the endstops.
+        Returns false if calibration was not finished
+        Returns true if calibration was finished
+        """
+        if self.move(0, 0, 50, -30000) and self.move(50, -30000, 0, 0):
+            # Verifica se o movimento foi pausado, o 2o move só é chamado se o primeiro não foi pausado
+            self.calibrated = True
+            self.curr_position_x = 0
+            self.curr_position_y = 0
+            return True
+
+        return False
 
     def move(self, speed_x, position_x, speed_y, position_y):
         position_x *= -STEPS_PER_MM
@@ -171,6 +189,12 @@ class MotorGcodeMachine(NullGcodeMachine):
             GPIO.output(STEP_PIN_Y, False)
             self.movement_done.set()
 
+            if self.pause_requested:
+                self.pause_requested = False
+                return False
+
+            return True
+
     def __move(self, speed_x, position_x, speed_y, position_y):
         # Validate positions
         if (
@@ -207,6 +231,9 @@ class MotorGcodeMachine(NullGcodeMachine):
         while (
             steps_remaining_x > 0 or steps_remaining_y > 0
         ) and not self.emergency_stop:
+            if self.pause_requested:
+                return False
+
             current_time = time.time()
 
             # Check endstops
@@ -215,14 +242,14 @@ class MotorGcodeMachine(NullGcodeMachine):
                 or GPIO.input(ENDSTOP_X_MAX) == GPIO.HIGH
             ):
                 self.__handle_endstop_x()
-                return
+                return True
 
             if (
                 GPIO.input(ENDSTOP_Y_MIN) == GPIO.HIGH
                 or GPIO.input(ENDSTOP_Y_MAX) == GPIO.HIGH
             ):
                 self.__handle_endstop_y()
-                return
+                return True
 
             # X axis movement
             if (
@@ -303,6 +330,8 @@ class MotorGcodeMachine(NullGcodeMachine):
                         step_interval_y = 1.0 / effective_speed_y
 
                 last_step_time_y = current_time
+
+        return True
 
     def __handle_endstop_x(self):
         pressed = []

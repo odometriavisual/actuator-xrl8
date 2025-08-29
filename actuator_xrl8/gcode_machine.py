@@ -29,6 +29,8 @@ class NullGcodeMachine:
     def g0(self, x: float, y: float) -> bool:
         """
         Fast linear movement. Used when the acquire is disabled.
+        Returns false if movement was not finished
+        Returns true if movement was finished
         """
         print(f"Recebido comando g0: {x = } {y = }")
         return self.g1(x, y, 100)

@@ -21,10 +21,13 @@ ENDSTOP_Y_MAX = 24  # Endstop for Y max
 
 RETURN_SPEED = 500  # Default return speed (steps/s)
 DEFAULT_INTERVAL = 0.0005  # Default step interval
+STEPS_PER_MM = 5 * 16
 
 
 class MotorGcodeMachine(NullGcodeMachine):
-    def __init__(self, accelerate=0.1, max_position=130000*80, min_position=-130000*80):
+    def __init__(
+        self, accelerate=0.1, max_position=130000 * STEPS_PER_MM, min_position=-130000 * STEPS_PER_MM
+    ):
         super().__init__()
         GPIO.setwarnings(False)
         GPIO.cleanup()
@@ -77,12 +80,20 @@ class MotorGcodeMachine(NullGcodeMachine):
         self.ramp_profile_down_y = None
         self.ramp_steps_y = 0
 
+    def is_calibrated(self):
+        "Returns true after homing"
+        return self.calibrated
+
+    def get_position(self) -> (float, float):
+        "Returns position in mm"
+        return (-self.curr_position_x / STEPS_PER_MM, self.curr_position_y / STEPS_PER_MM)
+
     def g0(self, x, y):
         self.g1(x, y, 50)
 
     def g1(self, x, y, s):
-        dx = x - self.curr_position_x/-80
-        dy = y - self.curr_position_y/80
+        dx = x - self.curr_position_x / -STEPS_PER_MM
+        dy = y - self.curr_position_y / STEPS_PER_MM
         position = math.sqrt(dx**2 + dy**2)
 
         if position == 0:
@@ -99,13 +110,12 @@ class MotorGcodeMachine(NullGcodeMachine):
         self.calibrated = True
         self.curr_position_x = 0
         self.curr_position_y = 0
-        self.pos = np.array([0, 0], dtype=float)
 
     def move(self, speed_x, position_x, speed_y, position_y):
-        position_x *= -80
-        position_y *= 80
-        speed_x *= 80
-        speed_y *= 80
+        position_x *= -STEPS_PER_MM
+        position_y *= STEPS_PER_MM
+        speed_x *= STEPS_PER_MM
+        speed_y *= STEPS_PER_MM
         self.emergency_stop = False
         self.movement_done.clear()
 
@@ -224,7 +234,6 @@ class MotorGcodeMachine(NullGcodeMachine):
                 if GPIO.input(STEP_PIN_X):
                     self.curr_position_x += dir_x
                     steps_remaining_x -= 1
-                    self.pos[0] = -self.curr_position_x/80
 
                 steps_performed_x = total_steps_x - steps_remaining_x
 
@@ -265,7 +274,6 @@ class MotorGcodeMachine(NullGcodeMachine):
                 if GPIO.input(STEP_PIN_Y):
                     self.curr_position_y += dir_y
                     steps_remaining_y -= 1
-                    self.pos[1] = self.curr_position_y/80
 
                 steps_performed_y = total_steps_y - steps_remaining_y
 

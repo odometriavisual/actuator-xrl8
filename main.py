@@ -19,7 +19,6 @@ def main():
     app.machine = GcodeMachine()
     app.interpreter = None
     app.running = False
-    app.was_pause_requested = True
 
     @app.route("/")
     def index():
@@ -37,7 +36,7 @@ def main():
         app.running = True
         if status := app.interpreter.step():
             if status is not True:
-                print(f'erro: {status}')
+                print(f'{status}')
 
         if app.interpreter.is_finished():
             app.interpreter = None
@@ -48,19 +47,19 @@ def main():
         if app.interpreter is not None:
             app.running = True
 
-            while status := app.interpreter.step() and not app.was_pause_requested:
+            while status := app.interpreter.step():
                 if status is not True:
-                    print(f'erro: {status}')
+                    print(f'{status}')
+                    break
 
             if app.interpreter.is_finished():
                 app.interpreter = None
 
             app.running = False
-            app.was_pause_requested = False
 
     @ws.on("pause")
     def pause():
-        app.was_pause_requested = True
+        app.machine.pause()
 
     def send_status():
         while True:

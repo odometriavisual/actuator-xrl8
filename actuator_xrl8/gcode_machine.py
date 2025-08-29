@@ -12,9 +12,11 @@ class NullGcodeMachine:
         self.calibrated = False
 
     def is_calibrated(self):
+        "Returns true after homing"
         return self.calibrated
 
     def get_position(self) -> (float, float):
+        "Returns position in mm"
         return tuple(self.pos)
 
     def _convert_mm_to_steps(self, a: NDArray):

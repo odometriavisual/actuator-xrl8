@@ -102,6 +102,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         Returns false if movement was not finished
         Returns true if movement was finished
         """
+        
         dx = x - self.curr_position_x / -STEPS_PER_MM
         dy = y - self.curr_position_y / STEPS_PER_MM
         position = math.sqrt(dx**2 + dy**2)
@@ -113,6 +114,155 @@ class MotorGcodeMachine(NullGcodeMachine):
         speed_y = (abs(dy) / position) * s
 
         return self.move(speed_x, x, speed_y, y)
+    
+    def g2_math(self, x, y, s, raio) -> bool:
+
+        x0 = self.curr_position_x / -STEPS_PER_MM
+        y0 = self.curr_position_y / STEPS_PER_MM
+        dx = x - x0
+        dy = y - y0
+        x_time = x
+        y_time = y  
+
+        speed_x = []
+        speed_y = []
+        position = math.sqrt(dx**2 + dy**2)
+
+        distancia = np.sqrt((x - x0) ** 2 + (y - y0) ** 2)
+
+        
+        if distancia > 2 * raio:
+            #precisa colocar uma condição na interface para que o raio, seja no minimo distancia/2
+            print(f"Erro: o raio deve ser maior que ({distancia/2:.2f}) ")
+            return
+        meio_x, meio_y = (x0 + x) / 2, (y0 + y) / 2
+        distancia_meio = np.sqrt(meio_x ** 2 + meio_y ** 2)
+
+        if distancia_meio == 0 and x0 == 0 and y0 == 0:
+
+            centro_x, centro_y = raio, 0
+        else:
+            h = np.sqrt(raio ** 2 - (distancia / 2) ** 2)
+            
+            #sentido horario
+            comprimento_perp = np.sqrt(-dy ** 2 + dx ** 2)
+            if comprimento_perp > 0:
+                -dy /= comprimento_perp
+                dx /= comprimento_perp
+
+
+            centro_x = meio_x + h * -dy
+            centro_y = meio_y + h * dx
+
+        angulo_inicial = np.arctan2(y0 - centro_y, x0 - centro_x)
+        angulo_final = np.arctan2(y - centro_y, x - centro_x)
+        #sentido horario
+        if angulo_final < angulo_inicial:
+            angulo_final += 2 * np.pi
+
+
+        theta = np.linspace(angulo_inicial, angulo_final, int(position*1.5))
+
+
+        x_semi = centro_x + raio * np.cos(theta)
+        y_semi = centro_y + raio * np.sin(theta)
+
+        '''os pontos q fazem a curva estao listados em (x_semi,y_semi), se quiser fazer uma estimativa da curva que ele vai fazer 
+        no web, para visualizar melhor a trajetoria, é só reutilizar o codigo daqui pra cima, nao utilizei a velocidade para nada acima deste comentário, 
+        se achar que vai facilitar a implementação fazer uma função só para gerar esses pontos e depois a gente integra com o g2(), me da um toque
+        '''
+
+        for i in range(len(x_semi)):
+            
+            
+            x_time = x_semi[i]-x_time
+            y_time = y_semi[i]-y_time
+            position = math.sqrt(x_time**2 + y_time**2)
+
+            if position == 0:
+                return True
+            speed_x.append((abs(x_time) / position) * s)
+            speed_y.append((abs(y_time) / position) * s)
+            x_time = x_semi[i]
+            y_time = y_semi[i]
+
+
+
+
+        return all(self.move(speed_x[i], x_semi[i], speed_y[i], y_semi[i]) for i in range(0, len(x_semi)) )
+
+    
+    def g3(self, x, y, s, raio) -> bool:
+        ''' a diferença do g2 para o g3 é só a parte que esta comentada "sentido anti horario"
+        '''
+
+        x0 = self.curr_position_x / -STEPS_PER_MM
+        y0 = self.curr_position_y / STEPS_PER_MM
+        dx = x - x0
+        dy = y - y0
+        x_time = x
+        y_time = y  
+
+        speed_x = []
+        speed_y = []
+        position = math.sqrt(dx**2 + dy**2)
+
+        distancia = np.sqrt((x - x0) ** 2 + (y - y0) ** 2)
+
+        
+        if distancia > 2 * raio:
+            #precisa colocar uma condição na interface para que o raio, seja no minimo distancia/2
+            print(f"Erro: o raio deve ser maior que ({distancia/2:.2f}) ")
+            return
+        meio_x, meio_y = (x0 + x) / 2, (y0 + y) / 2
+        distancia_meio = np.sqrt(meio_x ** 2 + meio_y ** 2)
+
+        if distancia_meio == 0 and x0 == 0 and y0 == 0:
+
+            centro_x, centro_y = raio, 0
+        else:
+            h = np.sqrt(raio ** 2 - (distancia / 2) ** 2)
+            
+            #sentido anti horario
+            comprimento_perp = np.sqrt(dy ** 2 + -dx ** 2)
+            if comprimento_perp > 0:
+                dy /= comprimento_perp
+                -dx /= comprimento_perp
+
+
+            centro_x = meio_x + h * dy
+            centro_y = meio_y + h * -dx
+
+        angulo_inicial = np.arctan2(y0 - centro_y, x0 - centro_x)
+        angulo_final = np.arctan2(y - centro_y, x - centro_x)
+        #sentido anti horario
+        if angulo_final > angulo_inicial:
+            angulo_final += 2 * np.pi
+
+
+        theta = np.linspace(angulo_inicial, angulo_final, int(position*1.5))
+
+
+        x_semi = centro_x + raio * np.cos(theta)
+        y_semi = centro_y + raio * np.sin(theta)
+
+        for i in range(len(x_semi)):
+            
+            
+            x_time = x_semi[i]-x_time
+            y_time = y_semi[i]-y_time
+            position = math.sqrt(x_time**2 + y_time**2)
+
+            if position == 0:
+                return True
+            speed_x.append((abs(x_time) / position) * s)
+            speed_y.append((abs(y_time) / position) * s)
+            x_time = x_semi[i]
+            y_time = y_semi[i]
+
+
+        return all(self.move(speed_x[i], x_semi[i], speed_y[i], y_semi[i]) for i in range(0, len(x_semi)) )
+
 
     def g28(self) -> bool:
         """
@@ -130,10 +280,12 @@ class MotorGcodeMachine(NullGcodeMachine):
         return False
 
     def move(self, speed_x, position_x, speed_y, position_y):
+
         position_x *= -STEPS_PER_MM
         position_y *= STEPS_PER_MM
         speed_x *= STEPS_PER_MM
         speed_y *= STEPS_PER_MM
+        
         self.emergency_stop = False
         self.movement_done.clear()
 
@@ -265,7 +417,7 @@ class MotorGcodeMachine(NullGcodeMachine):
                 steps_performed_x = total_steps_x - steps_remaining_x
 
                 # Calcular velocidade atual com perfil exponencial para X
-                if total_steps_x > 0:
+                if total_steps_x > 1000:
                     if steps_performed_x <= self.ramp_steps_x:
                         # Ramp up exponencial
                         profile_index = min(
@@ -305,7 +457,7 @@ class MotorGcodeMachine(NullGcodeMachine):
                 steps_performed_y = total_steps_y - steps_remaining_y
 
                 # Calcular velocidade atual com perfil exponencial para Y
-                if total_steps_y > 0:
+                if total_steps_y > 1000:
                     if steps_performed_y <= self.ramp_steps_y:
                         # Ramp up exponencial
                         profile_index = min(

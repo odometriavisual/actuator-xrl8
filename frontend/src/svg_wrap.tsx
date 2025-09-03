@@ -37,7 +37,7 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     }
     else if (type === CommandType.Arco_antihorario) {
       const delta2 = (endX - startX) * (endX - startX) + (endY - startY) * (endY - startY);
-      const broken = delta2 > r * r;
+      const broken = delta2 > 2 * r * 2 * r;
 
       return (
         <path d={`M ${startX} ${startY} A ${r} ${r} 0 0 0 ${endX} ${endY}`}

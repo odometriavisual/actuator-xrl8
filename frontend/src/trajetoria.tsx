@@ -73,9 +73,7 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
     const last_args = rev_nodes.find(n => CommandType.is_movement(n.command.type))?.command || { x: 40, y: 10, s: 50 };
 
     let next = {
-      id: nextId, command: {
-        type: CommandType.Linear, x: last_args.x + 10, y: last_args.y + 40, s: last_args.s, p: 1000, r: 1
-      }
+      id: nextId, command: { type: CommandType.Linear, x: last_args.x + 10, y: last_args.y + 40, s: last_args.s, p: 1000, r: 100 }
     };
 
     if (next.command.y > bounds.height - 50) {

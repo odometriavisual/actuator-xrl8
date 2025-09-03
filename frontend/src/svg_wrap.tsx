@@ -17,17 +17,38 @@ type SvgWrapArgs = {
 export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, offset, bounds }: SvgWrapArgs) {
   const dragInfo = useRef<any>(null);
 
-  function make_arrow(a: { x: number; y: number; }, b: { x: number; y: number; }, r: number) {
-    const dx = b.x - a.x, dy = b.y - a.y;
-    const d = Math.hypot(dx, dy) || 1;
-    const ux = dx / d;
-    const uy = dy / d;
-    const startX = a.x + ux * r;
-    const startY = a.y + uy * r;
-    const endX = b.x - ux * (r + 2.5);
-    const endY = b.y - uy * (r + 2.5);
+  function make_arrow(type: number, r: number, a: { x: number; y: number; }, b: { x: number; y: number; }) {
+    const startX = a.x;
+    const startY = a.y;
+    const endX = b.x;
+    const endY = b.y;
+
+
+    if (type === CommandType.Arco_horario) {
+      const delta2 = (endX - startX) * (endX - startX) + (endY - startY) * (endY - startY);
+      const broken = delta2 > 2 * r * 2 * r;
+
+      return (
+        <path d={`M ${startX} ${startY} A ${r} ${r} 0 0 1 ${endX} ${endY}`}
+          stroke={broken ? "var(--warning-color)" : "var(--on-surface-alt-color)"} stroke-width="2.5" stroke-linecap="round"
+          fill="none"
+          marker-end="url(#arrowhead)" opacity="0.95" />
+      );
+    }
+    else if (type === CommandType.Arco_antihorario) {
+      const delta2 = (endX - startX) * (endX - startX) + (endY - startY) * (endY - startY);
+      const broken = delta2 > r * r;
+
+      return (
+        <path d={`M ${startX} ${startY} A ${r} ${r} 0 0 0 ${endX} ${endY}`}
+          stroke={broken ? "var(--warning-color)" : "var(--on-surface-alt-color)"} stroke-width="2.5" stroke-linecap="round"
+          fill="none"
+          marker-end="url(#arrowhead)" opacity="0.95" />
+      );
+    }
+
     return (
-      <line style="pointer-events: none;" x1={startX} y1={startY} x2={endX} y2={endY}
+      <line x1={startX} y1={startY} x2={endX} y2={endY}
         stroke="var(--on-surface-alt-color)" stroke-width="2.5" stroke-linecap="round"
         marker-end="url(#arrowhead)" opacity="0.95" />
     );
@@ -53,7 +74,7 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     const nx = Math.max(Math.min(Math.round((pt.x - offset.x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
     const ny = Math.max(Math.min(Math.round((pt.y - offset.y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
 
-    let next = { id: nextId, command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 0 } };
+    let next = { id: nextId, command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 100 } };
 
     setNodes(prev => {
       is_dirty.current = true;
@@ -97,7 +118,7 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     <div className="svg-wrap">
       <svg viewBox={`${bounds.x0} ${bounds.y0} ${bounds.width} ${bounds.height}`} onDblClick={onDoubleClick} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <defs>
-          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="3.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
+          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
             <path d="M0,0 L5,2.5 L0,5 z" fill="var(--on-surface-alt-color)" />
           </marker>
           <filter id="shadow" x="-50%" y="-50%" width="250%" height="250%">
@@ -105,7 +126,22 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
           </filter>
         </defs>
         <g>
-          {move_nodes.map((n: any, i: number) => (
+          {
+            move_nodes.map((a: any, i0: number) => {
+              const [n, i] = a;
+
+              if (i == 0) return null;
+              const prev = nodes[move_nodes[i0 - 1][1]];
+              return make_arrow(
+                n.command.type,
+                n.command.r,
+                { ...prev, x: prev.command.x + offset.x, y: prev.command.y + offset.y },
+                { x: n.command.x + offset.x, y: n.command.y + offset.y },
+              );
+            })}
+        </g>
+        <g>
+          {move_nodes.map((n: any) => (
             <g key={n[0].id} onPointerDown={e => onPointerDown(e, n[1])}>
               <circle cx={n[0].command.x + offset.x} cy={n[0].command.y + offset.y} r={4.5}
                 fill="var(--on-surface-color)"
@@ -113,20 +149,6 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
                 style="cursor:grab" />
             </g>
           ))}
-        </g>
-        <g>
-          {
-            move_nodes.map((a: any, i0: number) => {
-              const [n, i] = a;
-
-              if (i == 0) return null;
-              const prev = nodes[move_nodes[i0 - 1][1]];
-              return make_arrow({
-                ...prev,
-                x: prev.command.x + offset.x, y: prev.command.y + offset.y
-              },
-                { x: n.command.x + offset.x, y: n.command.y + offset.y }, 4.5);
-            })}
         </g>
         {status.calibrated ?
           <g>

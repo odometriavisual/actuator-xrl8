@@ -17,3 +17,8 @@
   max-height: 100%;
   border: 1px solid var(--background-color);
 }
+
+.svg-wrap line,
+.svg-wrap path {
+  pointer-events: none;
+}

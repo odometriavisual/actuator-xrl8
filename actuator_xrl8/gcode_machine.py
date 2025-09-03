@@ -45,13 +45,13 @@ class NullGcodeMachine:
         end = np.array([x, y])
         dir = end - self.pos
         dir /= np.linalg.norm(dir)
-        while np.linalg.norm(end-self.pos) > 1:
+        while np.linalg.norm(end - self.pos) > 1:
             if self.pause_requested:
                 self.pause_requested = False
                 return False
 
             self.pos += dir
-            sleep(1/s)
+            sleep(1 / s)
 
         return True
 

@@ -13,7 +13,9 @@ from actuator_xrl8.gcode_interpreter import GcodeInterpreter
 
 
 def main():
-    app = Flask(__name__, static_url_path="/assets", static_folder="./frontend/dist/assets")
+    app = Flask(
+        __name__, static_url_path="/assets", static_folder="./frontend/dist/assets"
+    )
     ws = SocketIO(app, cors_allowed_origins="*")
 
     app.machine = GcodeMachine()
@@ -36,7 +38,7 @@ def main():
         app.running = True
         if status := app.interpreter.step():
             if status is not True:
-                print(f'{status}')
+                print(f"{status}")
 
         if app.interpreter.is_finished():
             app.interpreter = None
@@ -49,7 +51,7 @@ def main():
 
             while status := app.interpreter.step():
                 if status is not True:
-                    print(f'{status}')
+                    print(f"{status}")
                     break
 
             if app.interpreter.is_finished():
@@ -67,10 +69,11 @@ def main():
                 "running": app.running,
                 "gcode_loaded": app.interpreter is not None,
                 "pos": app.machine.get_position(),
-                "calibrated": app.machine.is_calibrated()
+                "calibrated": app.machine.is_calibrated(),
             }
             ws.emit("status", status)
-            sleep(1/30)
+            sleep(1 / 30)
+
     Thread(target=send_status, daemon=True).start()
 
     ws.run(app, allow_unsafe_werkzeug=True, host="0.0.0.0", port=8080)

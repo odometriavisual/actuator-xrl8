@@ -7,7 +7,16 @@ import './app.css'
 import { socket } from './socket.tsx';
 import { Manual } from './manual.tsx';
 
-export type TrajetoriaNode = { id: number, x: number, y: number, s: number, command: number };
+export const CommandType = {
+  Linear: 0,
+  Sleep: 1,
+  Arco_horario: 2,
+  Arco_antihorario: 3,
+  is_movement: (n: number) => n === CommandType.Linear || n === CommandType.Arco_horario || n == CommandType.Arco_antihorario,
+}
+export type CommandData = { type: number, x: number, r: number, y: number, s: number, p: number };
+
+export type TrajetoriaNode = { id: number, command: CommandData };
 export type Status = {
   connected: boolean,
   running: boolean,
@@ -61,10 +70,10 @@ export function App() {
   return (
     <div className="wrap">
       <div className="panel">
-          <div className="tabs">
-            <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
-            <button className={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </button>
-          </div>
+        <div className="tabs">
+          <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
+          <button className={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </button>
+        </div>
         {
           tab == 0 ?
             <Trajetoria nodes={nodes} setNodes={setNodes} nextId={nextId} setNextId={setNextId} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :

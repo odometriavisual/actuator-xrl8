@@ -2,7 +2,7 @@ import { useRef, type Dispatch, type MutableRef, type StateUpdater } from 'preac
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 import { socket } from './socket.tsx'
-import type { Bounds, Status, TrajetoriaNode } from './app.tsx'
+import { CommandType, type Bounds, type Status, type TrajetoriaNode } from './app.tsx'
 import './trajetoria.css'
 
 type TrajetoriaArgs = {
@@ -17,21 +17,73 @@ type TrajetoriaArgs = {
   bounds: Bounds,
 }
 
+function CommandArgsRow({ n, i, update_node }: { n: TrajetoriaNode, i: number, update_node: any }) {
+  switch (n.command.type) {
+    case CommandType.Linear:
+      return (
+        <>
+          <div> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, x: parseFloat(e.target.value) } })} /> </div>
+          <div> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, y: parseFloat(e.target.value) } })} /> </div>
+          {i === 0 ?
+            <div> <input disabled type="text" value="N/A" /></div> :
+            <div> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, s: parseFloat(e.target.value) } })} /> </div>
+          }
+        </>
+      );
+    case CommandType.Arco_horario:
+      return (
+        <>
+          <div> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, x: parseFloat(e.target.value) } })} /> </div>
+          <div> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, y: parseFloat(e.target.value) } })} /> </div>
+          <div> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, r: parseFloat(e.target.value) } })} /> </div>
+          {i === 0 ?
+            <div> <input disabled type="text" value="N/A" /></div> :
+            <div> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, s: parseFloat(e.target.value) } })} /> </div>
+          }
+        </>
+      );
+    case CommandType.Arco_antihorario:
+      return (
+        <>
+          <div> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, x: parseFloat(e.target.value) } })} /> </div>
+          <div> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, y: parseFloat(e.target.value) } })} /> </div>
+          <div> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, r: parseFloat(e.target.value) } })} /> </div>
+          {i === 0 ?
+            <div> <input disabled type="text" value="N/A" /></div> :
+            <div> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, s: parseFloat(e.target.value) } })} /> </div>
+          }
+        </>
+      );
+    case CommandType.Sleep:
+      return (
+        <div>
+          <input type="number" min="0" step="1" value={n.command.p} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, p: parseInt(e.target.value) } })} />
+        </div>
+      );
+  }
+}
+
+
 export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, status, offset, setOffset, bounds }: TrajetoriaArgs) {
   const rowDragIndex = useRef<number | null>(null);
 
   function add_node(e: Event) {
     e.preventDefault();
-    const last = nodes[nodes.length - 1] || { x: 40, y: 10, s: 50 };
+    let rev_nodes = [...nodes].reverse();
+    const last_args = rev_nodes.find(n => CommandType.is_movement(n.command.type))?.command || { x: 40, y: 10, s: 50 };
 
-    let next = { id: nextId, x: last.x + 10, y: last.y + 40, s: last.s, command: 0 }
+    let next = {
+      id: nextId, command: {
+        type: CommandType.Linear, x: last_args.x + 10, y: last_args.y + 40, s: last_args.s, p: 1000, r: 1
+      }
+    };
 
-    if (next.y > bounds.height - 50) {
-      next.x += 40;
-      next.y = 50;
+    if (next.command.y > bounds.height - 50) {
+      next.command.x += 40;
+      next.command.y = 50;
     }
-    if (next.x > bounds.width - 50) {
-      next.x = 50;
+    if (next.command.x > bounds.width - 50) {
+      next.command.x = 50;
     }
 
     setNodes(prev => {
@@ -58,8 +110,8 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
       let nodes = [...prev];
       nodes[i] = { ...node }
 
-      nodes[i].x = Math.max(Math.min(Math.round((nodes[i].x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
-      nodes[i].y = Math.max(Math.min(Math.round((nodes[i].y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
+      nodes[i].command.x = Math.max(Math.min(Math.round((nodes[i].command.x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
+      nodes[i].command.y = Math.max(Math.min(Math.round((nodes[i].command.y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
 
       is_dirty.current = true;
       return nodes;
@@ -68,14 +120,14 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
 
   function send_trajetoria() {
     const gcode = nodes.map((n, i) => {
-      const x = n.x + offset.x;
-      const y = n.y + offset.y;
+      const x = n.command.x + offset.x;
+      const y = n.command.y + offset.y;
 
       if (i == 0) {
         return `G0 X${x} Y${y}`;
       }
 
-      return `G1 X${x} Y${y} S${n.s}`;
+      return `G1 X${x} Y${y} S${n.command.s}`;
     }).join('\n');
 
     socket.emit("gcode", gcode)
@@ -143,12 +195,6 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
       </table>
       <div className="trajetoria">
         <div class="table">
-          <div class="thead">
-            <div>  </div>
-            <div> X </div>
-            <div> Y </div>
-            <div> Velocidade </div>
-          </div>
           {
             nodes.map((n: any, i: number) => (
               <div class="trow" key={n.id}>
@@ -158,21 +204,26 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
                   onDrop={onRowDrop} >
                   <i class="mv-node bi bi-list"></i>
                 </div>
-                <div> <input type="number" step="0.2" value={n.x} onInput={(e: any) => update_node(i, { ...n, x: parseFloat(e.target.value) })} /> </div>
-                <div> <input type="number" step="0.2" value={n.y} onInput={(e: any) => update_node(i, { ...n, y: parseFloat(e.target.value) })} /> </div>
-                {i === 0 ?
-                  <div> <input disabled type="text" value="N/A" /></div> :
-                  <div> <input type="number" step="1" value={n.s} onInput={(e: any) => update_node(i, { ...n, s: parseFloat(e.target.value) })} /> </div>
-                }
-                <div onClick={e => remove_node(e, i)}>
-                  <i class="rm-node bi bi-x-circle"
-                    onMouseEnter={ev => (ev.target as Element).classList.replace('bi-x-circle', 'bi-x-circle-fill')}
-                    onMouseLeave={ev => (ev.target as Element).classList.replace('bi-x-circle-fill', 'bi-x-circle')}></i>
-                </div>
-                <select class="command-sel" value={n.command} onInput={(e: any) => update_node(i, { ...n, command: e.target.command })}>
-                  <option value="1"> Iniciar aquisição </option>
-                  <option value="2"> Parar aquisição </option>
+
+                <select class="command-sel" value={n.command.type} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, type: parseInt(e.target.value) } })}>
+                  {i == 0 ?
+                    <option value={CommandType.Linear}> Iniciar </option>
+                    :
+                    <>
+                      <option value={CommandType.Linear}> Linear </option>
+                      <option value={CommandType.Arco_horario}> Arco 1 ↷ </option>
+                      <option value={CommandType.Arco_antihorario}> Arco 2 ↶ </option>
+                      <option value={CommandType.Sleep}> Sleep </option>
+                    </>
+                  }
                 </select>
+
+                <CommandArgsRow n={n} i={i} update_node={update_node} />
+
+                <i class="rm-node bi bi-x-circle"
+                  onClick={e => remove_node(e, i)}
+                  onMouseEnter={ev => (ev.target as Element).classList.replace('bi-x-circle', 'bi-x-circle-fill')}
+                  onMouseLeave={ev => (ev.target as Element).classList.replace('bi-x-circle-fill', 'bi-x-circle')}></i>
               </div>
             ))
           }

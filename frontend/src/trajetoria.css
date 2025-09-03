@@ -22,17 +22,9 @@
   overflow: scroll;
 }
 
-.trajetoria .thead {
-  display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 24px;
-  gap: 8px;
-  justify-content: space-between;
-  justify-items: center;
-}
-
 .trajetoria .trow {
   display: grid;
-  grid-template-columns: 24px 1fr 1fr 1fr 24px;
+  grid-template-columns: 14px 1.2fr repeat(4, 1fr) 24px;
   gap: 2px 8px;
   justify-content: space-between;
 }
@@ -58,6 +50,7 @@
 }
 
 .trajetoria .rm-node {
+  grid-column: -2;
   cursor: pointer;
   color: var(--warning-color);
 }

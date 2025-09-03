@@ -1,7 +1,7 @@
 import { useRef, type Dispatch, type MutableRef, type StateUpdater } from "preact/hooks";
 
 import './svg_wrap.css'
-import type { Bounds, Status, TrajetoriaNode } from "./app.tsx"
+import { CommandType, type Bounds, type Status, type TrajetoriaNode } from "./app.tsx"
 
 type SvgWrapArgs = {
   nodes: Array<TrajetoriaNode>,
@@ -48,11 +48,12 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
 
   const onDoubleClick = (e: MouseEvent) => {
     const pt = getSvgPoint(e);
-    const last = nodes[nodes.length - 1] || { s: 50 };
+    const move_nodes = nodes.filter(n => CommandType.is_movement(n.command.type));
+    const last = move_nodes[move_nodes.length - 1] || { s: 50 };
     const nx = Math.max(Math.min(Math.round((pt.x - offset.x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
     const ny = Math.max(Math.min(Math.round((pt.y - offset.y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
 
-    let next = { id: nextId, x: nx, y: ny, s: last.s, command: 0 }
+    let next = { id: nextId, command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 0 } };
 
     setNodes(prev => {
       is_dirty.current = true;
@@ -66,8 +67,8 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     const pt = getSvgPoint(e);
     dragInfo.current = {
       i,
-      offsetX: nodes[i].x + offset.x - pt.x,
-      offsetY: nodes[i].y + offset.y - pt.y
+      offsetX: nodes[i].command.x + offset.x - pt.x,
+      offsetY: nodes[i].command.y + offset.y - pt.y
     };
     (e.target as Element).setPointerCapture(e.pointerId);
   };
@@ -80,7 +81,7 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     const ny = Math.max(Math.min(Math.round((pt.y + offsetY) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
     setNodes((ns: any) => {
       const copy = [...ns];
-      copy[i] = { ...copy[i], x: nx, y: ny };
+      copy[i] = { ...copy[i], command: { ...copy[i].command, x: nx, y: ny } };
       is_dirty.current = true;
       return copy;
     });
@@ -89,6 +90,8 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
   const onPointerUp = () => {
     dragInfo.current = null;
   };
+
+  const move_nodes = nodes.map((n: any, i: number) => [n, i]).filter(a => CommandType.is_movement(a[0].command.type));
 
   return (
     <div className="svg-wrap">
@@ -102,9 +105,9 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
           </filter>
         </defs>
         <g>
-          {nodes.map((n: any, i: number) => (
-            <g key={n.id} onPointerDown={e => onPointerDown(e, i)}>
-              <circle cx={n.x + offset.x} cy={n.y + offset.y} r={4.5}
+          {move_nodes.map((n: any, i: number) => (
+            <g key={n[0].id} onPointerDown={e => onPointerDown(e, n[1])}>
+              <circle cx={n[0].command.x + offset.x} cy={n[0].command.y + offset.y} r={4.5}
                 fill="var(--on-surface-color)"
                 filter="url(#shadow)"
                 style="cursor:grab" />
@@ -112,11 +115,18 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
           ))}
         </g>
         <g>
-          {nodes.map((n: any, i: number) => {
-            if (i == 0) return null;
-            const prev = nodes[i - 1];
-            return make_arrow({ ...prev, x: prev.x + offset.x, y: prev.y + offset.y }, { ...n, x: n.x + offset.x, y: n.y + offset.y }, 4.5);
-          })}
+          {
+            move_nodes.map((a: any, i0: number) => {
+              const [n, i] = a;
+
+              if (i == 0) return null;
+              const prev = nodes[move_nodes[i0 - 1][1]];
+              return make_arrow({
+                ...prev,
+                x: prev.command.x + offset.x, y: prev.command.y + offset.y
+              },
+                { x: n.command.x + offset.x, y: n.command.y + offset.y }, 4.5);
+            })}
         </g>
         {status.calibrated ?
           <g>

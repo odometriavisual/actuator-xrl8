@@ -121,11 +121,24 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
       const x = n.command.x + offset.x;
       const y = n.command.y + offset.y;
 
-      if (i == 0) {
-        return `G0 X${x} Y${y}`;
+      switch (n.command.type) {
+        case CommandType.Linear:
+          if (i == 0) {
+            return `G0 X${x} Y${y}`;
+          }
+
+          return `G1 X${x} Y${y} S${n.command.s}`;
+
+        case CommandType.Arco_horario:
+          return `G2 X${x} Y${y} S${n.command.r} R${n.command.r}`;
+
+        case CommandType.Arco_antihorario:
+          return `G3 X${x} Y${y} S${n.command.r} R${n.command.r}`;
+
+        case CommandType.Sleep:
+          return `G4 P${n.command.p}`;
       }
 
-      return `G1 X${x} Y${y} S${n.command.s}`;
     }).join('\n');
 
     socket.emit("gcode", gcode)

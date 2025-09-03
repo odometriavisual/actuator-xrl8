@@ -54,6 +54,36 @@ class GcodeInterpreter:
                 else:
                     print("gcode error: malformed G1")
 
+            elif tok == "G2":
+                tok = self._lexer.get_next_token()
+                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else False
+                tok = self._lexer.get_next_token()
+                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else False
+                tok = self._lexer.get_next_token()
+                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else False
+                tok = self._lexer.get_next_token()
+                r = float(tok[1:]) if type(tok) is str and tok[0] == "R" else False
+
+                if all([x, y, s]):
+                    self._commands.append(("G2", x, y, s, r))
+                else:
+                    print("gcode error: malformed G1")
+
+            elif tok == "G3":
+                tok = self._lexer.get_next_token()
+                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else False
+                tok = self._lexer.get_next_token()
+                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else False
+                tok = self._lexer.get_next_token()
+                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else False
+                tok = self._lexer.get_next_token()
+                r = float(tok[1:]) if type(tok) is str and tok[0] == "R" else False
+
+                if all([x, y, s]):
+                    self._commands.append(("G3", x, y, s, r))
+                else:
+                    print("gcode error: malformed G1")
+
             elif tok == "G4":
                 tok = self._lexer.get_next_token()
                 p = int(tok[1:]) if type(tok) is str and tok[0] == "P" else False
@@ -109,9 +139,7 @@ class GcodeInterpreter:
                     return "interpreter error: malformed G0"
 
             elif comm == "G1":
-                x = self._commands[0][1]
-                y = self._commands[0][2]
-                s = self._commands[0][3]
+                x, y, s = self._commands[0][1:]
 
                 if all([x, y, s]):
                     if self._machine.g1(x, y, s):
@@ -121,6 +149,30 @@ class GcodeInterpreter:
                         return False
                 else:
                     return "interpreter error: malformed G1"
+
+            elif comm == "G2":
+                x, y, s, r = self._commands[0][1:]
+
+                if all([x, y, s]):
+                    if self._machine.g2(x, y, s, r):
+                        self._commands.pop(0)
+                        return True
+                    else:
+                        return False
+                else:
+                    return "interpreter error: malformed G2"
+
+            elif comm == "G3":
+                x, y, s, r = self._commands[0][1:]
+
+                if all([x, y, s]):
+                    if self._machine.g3(x, y, s, r):
+                        self._commands.pop(0)
+                        return True
+                    else:
+                        return False
+                else:
+                    return "interpreter error: malformed G3"
 
             elif comm == "G4":
                 p = self._commands[0][1]

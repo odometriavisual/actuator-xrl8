@@ -6,6 +6,12 @@ Fast linear movement. Used when the acquire is disabled.
 ## G1 Xn Yn Sn
 Linear movement. Used when the acquire is enabled.
 
+## G2 Xn Yn Sn Rn
+Clockwise arc movement. 
+
+## G3 Xn Yn Sn Rn
+Counterclockwise arc movement. 
+
 ## G4 Pn
 Dwell. Stops for n millisecons.
 

@@ -17,7 +17,31 @@ type TrajetoriaArgs = {
   bounds: Bounds,
 }
 
-function CommandArgsRow({ n, i, update_node }: { n: TrajetoriaNode, i: number, update_node: any }) {
+function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: number, nodes: TrajetoriaNode[], update_node: any }) {
+  const update_x = (value: number) => update_node(i, { ...n, command: { ...n.command, x: value } });
+  const update_y = (value: number) => update_node(i, { ...n, command: { ...n.command, y: value } });
+  const update_s = (value: number) => update_node(i, { ...n, command: { ...n.command, s: value } });
+  const update_t = (value: number) => update_node(i, { ...n, command: { ...n.command, t: value } });
+
+  const update_r = (value: number) => {
+    let last_move_i = i - 1;
+    while (last_move_i >= 0) {
+      if (CommandType.is_movement(nodes[last_move_i].command.type)) {
+        break;
+      }
+      last_move_i -= 1;
+    }
+
+    if (last_move_i >= 0) {
+      const {x, y} = nodes[last_move_i].command;
+      const min_r = Math.round(Math.sqrt(Math.pow(n.command.x - x, 2) + Math.pow(n.command.y - y, 2))/2*5+1)/5;
+      update_node(i, { ...n, command: { ...n.command, r: Math.max(min_r, value) } });
+    }
+    else {
+      update_node(i, { ...n, command: { ...n.command, r: value } });
+    }
+  };
+
   switch (n.command.type) {
     case CommandType.Iniciar:
       return (
@@ -30,43 +54,32 @@ function CommandArgsRow({ n, i, update_node }: { n: TrajetoriaNode, i: number, u
     case CommandType.Linear:
       return (
         <>
-          <div> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, x: parseFloat(e.target.value) } })} /> </div>
-          <div> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, y: parseFloat(e.target.value) } })} /> </div>
-          {i === 0 ?
-            <div> <input disabled type="text" value="N/A" /></div> :
-            <div> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, s: parseFloat(e.target.value) } })} /> </div>
-          }
+          <label> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
         </>
       );
     case CommandType.Arco_horario:
       return (
         <>
-          <div> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, x: parseFloat(e.target.value) } })} /> </div>
-          <div> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, y: parseFloat(e.target.value) } })} /> </div>
-          <div> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, r: parseFloat(e.target.value) } })} /> </div>
-          {i === 0 ?
-            <div> <input disabled type="text" value="N/A" /></div> :
-            <div> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, s: parseFloat(e.target.value) } })} /> </div>
-          }
+          <label> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
         </>
       );
     case CommandType.Arco_antihorario:
       return (
         <>
-          <div> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, x: parseFloat(e.target.value) } })} /> </div>
-          <div> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, y: parseFloat(e.target.value) } })} /> </div>
-          <div> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, r: parseFloat(e.target.value) } })} /> </div>
-          {i === 0 ?
-            <div> <input disabled type="text" value="N/A" /></div> :
-            <div> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, s: parseFloat(e.target.value) } })} /> </div>
-          }
+          <label> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
         </>
       );
     case CommandType.Sleep:
       return (
-        <div>
-          <input type="number" min="0" step="1" value={n.command.p} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, p: parseInt(e.target.value) } })} />
-        </div>
+        <label> <input type="number" min="0" step="1" value={n.command.p} onInput={(e: any) => update_t(parseInt(e.target.value))} /> </label>
       );
   }
 }
@@ -142,10 +155,10 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
           return `G1 X${x} Y${y} S${n.command.s}`;
 
         case CommandType.Arco_horario:
-          return `G2 X${x} Y${y} S${n.command.r} R${n.command.r}`;
+          return `G2 X${x} Y${y} S${n.command.s} R${n.command.r}`;
 
         case CommandType.Arco_antihorario:
-          return `G3 X${x} Y${y} S${n.command.r} R${n.command.r}`;
+          return `G3 X${x} Y${y} S${n.command.s} R${n.command.r}`;
 
         case CommandType.Sleep:
           return `G4 P${n.command.p}`;
@@ -241,7 +254,7 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
                   }
                 </select>
 
-                <CommandArgsRow n={n} i={i} update_node={update_node} />
+                <CommandArgs n={n} i={i} nodes={nodes} update_node={update_node} />
 
                 <i class="rm-node bi bi-x-circle"
                   onClick={e => remove_node(e, i)}

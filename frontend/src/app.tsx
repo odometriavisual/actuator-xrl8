@@ -8,11 +8,12 @@ import { socket } from './socket.tsx';
 import { Manual } from './manual.tsx';
 
 export const CommandType = {
+  Iniciar: -1,
   Linear: 0,
   Sleep: 1,
   Arco_horario: 2,
   Arco_antihorario: 3,
-  is_movement: (n: number) => n === CommandType.Linear || n === CommandType.Arco_horario || n == CommandType.Arco_antihorario,
+  is_movement: (n: number) => n === CommandType.Iniciar || n === CommandType.Linear || n === CommandType.Arco_horario || n == CommandType.Arco_antihorario,
 }
 export type CommandData = { type: number, x: number, r: number, y: number, s: number, p: number };
 

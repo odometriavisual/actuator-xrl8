@@ -19,6 +19,14 @@ type TrajetoriaArgs = {
 
 function CommandArgsRow({ n, i, update_node }: { n: TrajetoriaNode, i: number, update_node: any }) {
   switch (n.command.type) {
+    case CommandType.Iniciar:
+      return (
+        <>
+          <label> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+        </>
+      );
+
     case CommandType.Linear:
       return (
         <>
@@ -82,6 +90,10 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
     }
     if (next.command.x > bounds.width - 50) {
       next.command.x = 50;
+    }
+
+    if (nodes.length === 0) {
+      next.command.type = CommandType.Iniciar;
     }
 
     setNodes(prev => {
@@ -218,7 +230,7 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
 
                 <select class="command-sel" value={n.command.type} onInput={(e: any) => update_node(i, { ...n, command: { ...n.command, type: parseInt(e.target.value) } })}>
                   {i == 0 ?
-                    <option value={CommandType.Linear}> Iniciar </option>
+                    <option value={CommandType.Iniciar}> Iniciar </option>
                     :
                     <>
                       <option value={CommandType.Linear}> Linear </option>

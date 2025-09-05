@@ -34,17 +34,27 @@
   grid-area: 3 / 2;
 }
 
-.manual-controls {
+.manual-goto {
   display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.manual-goto input {
+  min-width: 0px;
+  flex-grow: 0;
+  flex-shrink: 1;
+}
+
+.manual-multiplier {
+  display: flex;
+  flex-direction: row;
   justify-content: space-evenly;
-  align-items: center;
+  gap: 12px;
   padding: 12px;
+  border: 2px solid var(--primary-color);
 }
 
-.manual-controls>fieldset {
-  border: none;
-}
-
-.manual-wrap .home {
+.manual-wrap i {
   font-size: 3em;
 }

@@ -30,7 +30,7 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
       const { x, y } = last_move_node.command;
       const nx = n.command.x;
       const ny = n.command.y;
-      const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2))*500/2)/500;
+      const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2)) * 500 / 2) / 500;
       update_node(i, { ...n, command: { ...n.command, r: Math.max(min_r, value) } });
     }
     else {
@@ -194,9 +194,18 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
 
     const from = rowDragIndex.current;
     if (from === null || from === i) return;
-    setNodes((prev: any) => {
+    setNodes(prev => {
       const copy = [...prev];
       const [moved] = copy.splice(from, 1);
+
+      if (i === 0) {
+        copy[i].command.type = moved.command.type;
+        moved.command.type = CommandType.Iniciar;
+      }
+      else if (rowDragIndex.current === 0) {
+        moved.command.type = copy[i-1].command.type;
+      }
+
       copy.splice(i, 0, moved);
       rowDragIndex.current = i;
       return copy;

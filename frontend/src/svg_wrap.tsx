@@ -1,7 +1,7 @@
 import { useRef, type Dispatch, type MutableRef, type StateUpdater } from "preact/hooks";
 
+import { CommandType, type Bounds, type Status, type TrajetoriaNode } from './types.tsx';
 import './svg_wrap.css'
-import { CommandType, type Bounds, type Status, type TrajetoriaNode } from "./app.tsx"
 
 type SvgWrapArgs = {
   nodes: Array<TrajetoriaNode>,

@@ -2,7 +2,7 @@ import { useRef, type Dispatch, type MutableRef, type StateUpdater } from 'preac
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 import { socket } from './socket.tsx'
-import { CommandType, type Bounds, type Status, type TrajetoriaNode } from './app.tsx'
+import { CommandType, type Bounds, type Status, type TrajetoriaNode } from './types.tsx'
 import './trajetoria.css'
 
 type TrajetoriaArgs = {

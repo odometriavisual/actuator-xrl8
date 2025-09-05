@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks';
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 import { socket } from './socket';
-import type { Status } from './app';
+import type { Status } from './types.tsx';
 import './manual.css'
 
 type ManualParams = {

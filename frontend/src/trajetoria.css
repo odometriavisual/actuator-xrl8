@@ -26,7 +26,10 @@
   display: grid;
   grid-template-columns: 14px 1.2fr repeat(4, 1fr) 24px;
   gap: 2px 8px;
+
   justify-content: space-between;
+  align-items: center;
+  text-align: center;
 }
 
 .trajetoria .command-sel {

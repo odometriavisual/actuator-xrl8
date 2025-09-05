@@ -60,8 +60,8 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
         <>
           <label> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
           <label> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
-          <label> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
           <label> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
         </>
       );
     case CommandType.Arco_antihorario:
@@ -69,8 +69,8 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
         <>
           <label> <input type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
           <label> <input type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
-          <label> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
           <label> <input type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
+          <label> <input type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
         </>
       );
     case CommandType.Sleep:
@@ -203,7 +203,7 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
         moved.command.type = CommandType.Iniciar;
       }
       else if (rowDragIndex.current === 0) {
-        moved.command.type = copy[i-1].command.type;
+        moved.command.type = copy[i - 1].command.type;
       }
 
       copy.splice(i, 0, moved);
@@ -235,6 +235,14 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
       </table>
       <div className="trajetoria">
         <div class="table">
+          <div class="trow">
+            <div></div>
+            <div>Comando</div>
+            <div>X (mm) <br /> T (ms)</div>
+            <div>Y (mm)</div>
+            <div>Speed (mm/s)</div>
+            <div>Raio (mm)</div>
+          </div>
           {
             nodes.map((n: any, i: number) => (
               <div class="trow" key={n.id}>

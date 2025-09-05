@@ -21,7 +21,7 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
   const update_x = (value: number) => update_node(i, { ...n, command: { ...n.command, x: value } });
   const update_y = (value: number) => update_node(i, { ...n, command: { ...n.command, y: value } });
   const update_s = (value: number) => update_node(i, { ...n, command: { ...n.command, s: value } });
-  const update_t = (value: number) => update_node(i, { ...n, command: { ...n.command, t: value } });
+  const update_p = (value: number) => update_node(i, { ...n, command: { ...n.command, p: value } });
 
   const update_r = (value: number) => {
     const last_move_node = find_last_movement_node_before(i, nodes);
@@ -75,7 +75,7 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
       );
     case CommandType.Sleep:
       return (
-        <label> <input type="number" min="0" step="1" value={n.command.p} onInput={(e: any) => update_t(parseInt(e.target.value))} /> </label>
+        <label> <input type="number" min="0" step="1" value={n.command.p} onInput={(e: any) => update_p(parseInt(e.target.value))} /> </label>
       );
   }
 }

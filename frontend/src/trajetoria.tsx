@@ -138,7 +138,7 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
   }
 
   function send_trajetoria() {
-    const gcode = nodes.map((n, i) => {
+    const gcode = nodes.map(n => {
       const x = n.command.x + offset.x;
       const y = n.command.y + offset.y;
 

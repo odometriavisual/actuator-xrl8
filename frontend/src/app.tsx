@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState, type Dispatch, type StateUpdater } from 'preact/hooks';
 
 import { SvgWrap } from './svg_wrap.tsx';
 import { Trajetoria } from './trajetoria.tsx';
@@ -16,8 +16,8 @@ export function App() {
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const is_dirty = useRef<boolean>(true);
 
-  const setNodesStorage = (ns: (_: TrajetoriaNode[]) => TrajetoriaNode[]) => {
-    const next_ns = ns(nodes);
+  const setNodesStorage: Dispatch<StateUpdater<TrajetoriaNode[]>> = value => {
+    const next_ns = value instanceof Function? value(nodes): value;
     next_ns[0].command.type = CommandType.Iniciar;
 
     localStorage.setItem('nodes', JSON.stringify(next_ns));

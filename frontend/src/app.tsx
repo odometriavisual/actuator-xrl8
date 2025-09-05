@@ -16,8 +16,10 @@ export function App() {
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const is_dirty = useRef<boolean>(true);
 
-  const setNodesStorage = (ns: any) => {
+  const setNodesStorage = (ns: (_: TrajetoriaNode[]) => TrajetoriaNode[]) => {
     const next_ns = ns(nodes);
+    next_ns[0].command.type = CommandType.Iniciar;
+
     localStorage.setItem('nodes', JSON.stringify(next_ns));
     setNodes(next_ns);
   };

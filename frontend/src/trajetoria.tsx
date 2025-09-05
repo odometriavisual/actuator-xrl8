@@ -147,11 +147,10 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
       const y = n.command.y + offset.y;
 
       switch (n.command.type) {
-        case CommandType.Linear:
-          if (i == 0) {
-            return `G0 X${x} Y${y}`;
-          }
+        case CommandType.Iniciar:
+          return `G0 X${x} Y${y}`;
 
+        case CommandType.Linear:
           return `G1 X${x} Y${y} S${n.command.s}`;
 
         case CommandType.Arco_horario:

@@ -2,7 +2,7 @@ import { useRef, type Dispatch, type MutableRef, type StateUpdater } from 'preac
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 import { socket } from './socket.tsx'
-import { CommandType, type Bounds, type Status, type TrajetoriaNode } from './types.tsx'
+import { CommandType, find_last_movement_node_before, type Bounds, type Status, type TrajetoriaNode } from './types.tsx'
 import './trajetoria.css'
 
 type TrajetoriaArgs = {
@@ -24,17 +24,13 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
   const update_t = (value: number) => update_node(i, { ...n, command: { ...n.command, t: value } });
 
   const update_r = (value: number) => {
-    let last_move_i = i - 1;
-    while (last_move_i >= 0) {
-      if (CommandType.is_movement(nodes[last_move_i].command.type)) {
-        break;
-      }
-      last_move_i -= 1;
-    }
+    const last_move_node = find_last_movement_node_before(i, nodes);
 
-    if (last_move_i >= 0) {
-      const {x, y} = nodes[last_move_i].command;
-      const min_r = Math.round(Math.sqrt(Math.pow(n.command.x - x, 2) + Math.pow(n.command.y - y, 2))/2*5+1)/5;
+    if (last_move_node !== null) {
+      const { x, y } = last_move_node.command;
+      const nx = n.command.x;
+      const ny = n.command.y;
+      const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2))*500/2)/500;
       update_node(i, { ...n, command: { ...n.command, r: Math.max(min_r, value) } });
     }
     else {

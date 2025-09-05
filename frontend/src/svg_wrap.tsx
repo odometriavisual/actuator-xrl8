@@ -1,6 +1,6 @@
 import { useRef, type Dispatch, type MutableRef, type StateUpdater } from "preact/hooks";
 
-import { CommandType, type Bounds, type Status, type TrajetoriaNode } from './types.tsx';
+import { CommandType, find_last_movement_node_before, type Bounds, type Status, type TrajetoriaNode } from './types.tsx';
 import './svg_wrap.css'
 
 type SvgWrapArgs = {
@@ -22,7 +22,6 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     const startY = a.y;
     const endX = b.x;
     const endY = b.y;
-
 
     if (type === CommandType.Arco_horario) {
       const delta2 = (endX - startX) * (endX - startX) + (endY - startY) * (endY - startY);
@@ -100,9 +99,23 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     const pt = getSvgPoint(e);
     const nx = Math.max(Math.min(Math.round((pt.x + offsetX) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
     const ny = Math.max(Math.min(Math.round((pt.y + offsetY) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
-    setNodes((ns: any) => {
+
+    setNodes((ns: TrajetoriaNode[]) => {
       const copy = [...ns];
-      copy[i] = { ...copy[i], command: { ...copy[i].command, x: nx, y: ny } };
+      const command_type = copy[i].command.type;
+
+      if (command_type === CommandType.Arco_horario || command_type === CommandType.Arco_antihorario) {
+        const {command: {x, y}} = find_last_movement_node_before(i, copy);
+        const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2))*500/2)/500;
+        copy[i].command.x = nx;
+        copy[i].command.y = ny;
+        copy[i].command.r = min_r;
+      }
+      else {
+        copy[i].command.x = nx;
+        copy[i].command.y = ny;
+      }
+
       is_dirty.current = true;
       return copy;
     });

@@ -93,7 +93,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         "Returns position in mm"
         return (
             -self.curr_position_x / STEPS_PER_MM,
-            self.curr_position_y / STEPS_PER_MM,
+            -self.curr_position_y / STEPS_PER_MM,
         )
 
     def g0(self, x, y) -> bool:
@@ -112,7 +112,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         """
 
         dx = x - self.curr_position_x / -STEPS_PER_MM
-        dy = y - self.curr_position_y / STEPS_PER_MM
+        dy = y - self.curr_position_y / -STEPS_PER_MM
         position = math.sqrt(dx**2 + dy**2)
 
         if position == 0:
@@ -125,7 +125,7 @@ class MotorGcodeMachine(NullGcodeMachine):
 
     def g2(self, x, y, s, raio) -> bool:
         x0 = self.curr_position_x / -STEPS_PER_MM
-        y0 = self.curr_position_y / STEPS_PER_MM
+        y0 = self.curr_position_y / -STEPS_PER_MM
         dx = x - x0
         dy = y - y0
         x_time = x
@@ -201,7 +201,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         """a diferença do g2 para o g3 é só a parte que esta comentada "sentido anti horario" """
 
         x0 = self.curr_position_x / -STEPS_PER_MM
-        y0 = self.curr_position_y / STEPS_PER_MM
+        y0 = self.curr_position_y / -STEPS_PER_MM
         dx = x - x0
         dy = y - y0
 
@@ -215,7 +215,9 @@ class MotorGcodeMachine(NullGcodeMachine):
         distancia = np.sqrt((x - x0) ** 2 + (y - y0) ** 2)
 
         if distancia > 2 * raio:
-            # precisa colocar uma condição na interface para que o raio, seja no minimo distancia/2
+            print(x,y,s,raio)
+
+             #precisa colocar uma condição na interface para que o raio, seja no minimo distancia/2
             print(f"Erro: o raio deve ser maior que ({distancia / 2:.2f}) ")
             return
         meio_x, meio_y = (x0 + x) / 2, (y0 + y) / 2
@@ -288,7 +290,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         # print(position_x, position_y)
 
         position_x *= -STEPS_PER_MM
-        position_y *= STEPS_PER_MM
+        position_y *= -STEPS_PER_MM
         speed_x *= STEPS_PER_MM
         speed_y *= STEPS_PER_MM
 

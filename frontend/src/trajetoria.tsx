@@ -30,8 +30,13 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
       const { x, y } = last_move_node.command;
       const nx = n.command.x;
       const ny = n.command.y;
-      const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2)) * 500 / 2) / 500;
-      update_node(i, { ...n, command: { ...n.command, r: Math.max(min_r, value) } });
+
+      if (value < 0.0001) {
+        const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2)) * 500 / 2) / 500;
+        value = min_r;
+      }
+
+      update_node(i, { ...n, command: { ...n.command, r: value } });
     }
     else {
       update_node(i, { ...n, command: { ...n.command, r: value } });

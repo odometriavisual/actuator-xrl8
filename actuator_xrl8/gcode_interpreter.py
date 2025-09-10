@@ -32,85 +32,85 @@ class GcodeInterpreter:
 
             if tok == "G0":
                 tok = self._lexer.get_next_token()
-                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else False
+                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else None
                 tok = self._lexer.get_next_token()
-                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else False
+                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else None
 
-                if (x, y) != (False, False):
+                if (x, y) != (None, None):
                     self._commands.append(("G0", x, y))
                 else:
-                    print("gcode error: malformed G0")
+                    print(f"gcode error: malformed G0: {x = }, {y = }")
 
             elif tok == "G1":
                 tok = self._lexer.get_next_token()
-                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else False
+                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else None
                 tok = self._lexer.get_next_token()
-                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else False
+                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else None
                 tok = self._lexer.get_next_token()
-                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else False
+                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else None
 
-                if all([x, y, s]):
+                if all(i is not None for i in [x, y, s]):
                     self._commands.append(("G1", x, y, s))
                 else:
-                    print("gcode error: malformed G1")
+                    print(f"gcode error: malformed G1: {x = }, {y = }, {s = }")
 
             elif tok == "G2":
                 tok = self._lexer.get_next_token()
-                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else False
+                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else None
                 tok = self._lexer.get_next_token()
-                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else False
+                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else None
                 tok = self._lexer.get_next_token()
-                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else False
+                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else None
                 tok = self._lexer.get_next_token()
-                r = float(tok[1:]) if type(tok) is str and tok[0] == "R" else False
+                r = float(tok[1:]) if type(tok) is str and tok[0] == "R" else None
 
-                if all([x, y, s]):
+                if all(i is not None for i in [x, y, s, r]):
                     self._commands.append(("G2", x, y, s, r))
                 else:
-                    print("gcode error: malformed G1")
+                    print(f"gcode error: malformed G2: {x = }, {y = }, {s = }, {r = }")
 
             elif tok == "G3":
                 tok = self._lexer.get_next_token()
-                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else False
+                x = float(tok[1:]) if type(tok) is str and tok[0] == "X" else None
                 tok = self._lexer.get_next_token()
-                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else False
+                y = float(tok[1:]) if type(tok) is str and tok[0] == "Y" else None
                 tok = self._lexer.get_next_token()
-                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else False
+                s = float(tok[1:]) if type(tok) is str and tok[0] == "S" else None
                 tok = self._lexer.get_next_token()
-                r = float(tok[1:]) if type(tok) is str and tok[0] == "R" else False
+                r = float(tok[1:]) if type(tok) is str and tok[0] == "R" else None
 
-                if all([x, y, s]):
+                if all(i is not None for i in [x, y, s, r]):
                     self._commands.append(("G3", x, y, s, r))
                 else:
-                    print("gcode error: malformed G1")
+                    print(f"gcode error: malformed G3: {x = }, {y = }, {s = }, {r = }")
 
             elif tok == "G4":
                 tok = self._lexer.get_next_token()
-                p = int(tok[1:]) if type(tok) is str and tok[0] == "P" else False
+                p = int(tok[1:]) if type(tok) is str and tok[0] == "P" else None
 
-                if p:
+                if p is not None:
                     self._commands.append(("G4", p))
                 else:
-                    print("gcode error: malformed G4")
+                    print(f"gcode error: malformed G4: {p = }")
 
             elif tok == "M1000":
                 tok = self._lexer.get_next_token()
-                f = int(tok[1:]) if type(tok) is str and tok[0] == "F" else False
+                f = int(tok[1:]) if type(tok) is str and tok[0] == "F" else None
                 s = self._lexer.get_next_token()[1:-1]
 
-                if all([f, s]):
+                if all(i is not None for i in [f, s]):
                     self._commands.append(("M1000", f, s))
                 else:
-                    print("gcode error: malformed M1000")
+                    print(f"gcode error: malformed M1000: {f = }, {s = }")
 
             elif tok == "M1004":
                 tok = self._lexer.get_next_token()
-                e = int(tok[1:]) if type(tok) is str and tok[0] == "E" else False
+                e = int(tok[1:]) if type(tok) is str and tok[0] == "E" else None
 
                 if e:
                     self._commands.append(("M1004", e))
                 else:
-                    print("gcode error: malformed M1004")
+                    print(f"gcode error: malformed M1004: {e = }")
 
             elif tok in ["G28", "G90", "G91", "M1001", "M1002", "M1003"]:
                 self._commands.append((tok,))
@@ -129,7 +129,7 @@ class GcodeInterpreter:
                 x = self._commands[0][1]
                 y = self._commands[0][2]
 
-                if (x, y) != (False, False):
+                if (x, y) != (None, None):
                     if self._machine.g0(x, y):
                         self._commands.pop(0)
                         return True
@@ -141,7 +141,7 @@ class GcodeInterpreter:
             elif comm == "G1":
                 x, y, s = self._commands[0][1:]
 
-                if all([x, y, s]):
+                if all(i is not None for i in [x, y, s]):
                     if self._machine.g1(x, y, s):
                         self._commands.pop(0)
                         return True
@@ -153,7 +153,7 @@ class GcodeInterpreter:
             elif comm == "G2":
                 x, y, s, r = self._commands[0][1:]
 
-                if all([x, y, s]):
+                if all(i is not None for i in [x, y, s]):
                     if self._machine.g2(x, y, s, r):
                         self._commands.pop(0)
                         return True
@@ -165,7 +165,7 @@ class GcodeInterpreter:
             elif comm == "G3":
                 x, y, s, r = self._commands[0][1:]
 
-                if all([x, y, s]):
+                if all(i is not None for i in [x, y, s]):
                     if self._machine.g3(x, y, s, r):
                         self._commands.pop(0)
                         return True
@@ -177,7 +177,7 @@ class GcodeInterpreter:
             elif comm == "G4":
                 p = self._commands[0][1]
 
-                if p:
+                if p is not None:
                     self._machine.g4(p)
                     self._commands.pop(0)
                     return True
@@ -188,7 +188,7 @@ class GcodeInterpreter:
                 f = self._commands[0][1]
                 s = self._commands[0][2]
 
-                if all([f, s]):
+                if all(i is not None for i in [f, s]):
                     self._machine.m1000(f, s)
                     self._commands.pop(0)
                     return True

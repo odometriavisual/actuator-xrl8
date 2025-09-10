@@ -55,6 +55,46 @@ class NullGcodeMachine:
 
         return True
 
+    def g2(self, x: float, y: float, s: float, r: float) -> bool:
+        """
+        Clockwise arc movement. 
+        Returns false if movement was not finished
+        Returns true if movement was finished
+        """
+        print(f"Recebido comando g2: {x = } {y = } {s = } {r = }")
+        end = np.array([x, y])
+        dir = end - self.pos
+        dir /= np.linalg.norm(dir)
+        while np.linalg.norm(end - self.pos) > 1:
+            if self.pause_requested:
+                self.pause_requested = False
+                return False
+
+            self.pos += dir
+            sleep(1 / s)
+
+        return True
+
+    def g3(self, x: float, y: float, s: float, r: float) -> bool:
+        """
+        Counterclockwise arc movement. 
+        Returns false if movement was not finished
+        Returns true if movement was finished
+        """
+        print(f"Recebido comando g3: {x = } {y = } {s = } {r = }")
+        end = np.array([x, y])
+        dir = end - self.pos
+        dir /= np.linalg.norm(dir)
+        while np.linalg.norm(end - self.pos) > 1:
+            if self.pause_requested:
+                self.pause_requested = False
+                return False
+
+            self.pos += dir
+            sleep(1 / s)
+
+        return True
+
     def g4(self, p: int):
         """
         Dwell. Stops for p millisecons.

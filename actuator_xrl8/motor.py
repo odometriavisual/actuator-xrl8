@@ -164,7 +164,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         if angulo_final < angulo_inicial:
             angulo_final += 2 * np.pi
 
-        theta = np.linspace(angulo_inicial, angulo_final, int(position * 1.5))
+        theta = np.linspace(angulo_inicial, angulo_final, int(position * 2))
 
         x_semi = centro_x + raio * np.cos(theta)
         y_semi = centro_y + raio * np.sin(theta)
@@ -243,7 +243,7 @@ class MotorGcodeMachine(NullGcodeMachine):
         if angulo_final > angulo_inicial:
             angulo_final -= 2 * np.pi
 
-        theta = np.linspace(angulo_inicial, angulo_final, int(position * 1.5))
+        theta = np.linspace(angulo_inicial, angulo_final, int(position * 2))
 
         x_semi = centro_x + raio * np.cos(theta)
         y_semi = centro_y + raio * np.sin(theta)

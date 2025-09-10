@@ -6,8 +6,6 @@ import numpy as np
 
 from actuator_xrl8.gcode_machine import NullGcodeMachine
 
-import matplotlib.pyplot as plt
-
 # Pin definitions (adjust according to your wiring)
 STEP_PIN_X = 10  # Step pin for X axis
 DIR_PIN_X = 22  # Direction pin for X axis
@@ -215,11 +213,10 @@ class MotorGcodeMachine(NullGcodeMachine):
         distancia = np.sqrt((x - x0) ** 2 + (y - y0) ** 2)
 
         if distancia > 2 * raio:
-            print(x,y,s,raio)
-
-             #precisa colocar uma condição na interface para que o raio, seja no minimo distancia/2
+            # precisa colocar uma condição na interface para que o raio, seja no minimo distancia/2
             print(f"Erro: o raio deve ser maior que ({distancia / 2:.2f}) ")
             return
+
         meio_x, meio_y = (x0 + x) / 2, (y0 + y) / 2
         distancia_meio = np.sqrt(meio_x**2 + meio_y**2)
 

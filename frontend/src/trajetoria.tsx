@@ -284,10 +284,11 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
         <div className="controls">
           <button disabled={status.running} onClick={add_node} > + 1 </button>
           <button disabled={!status.connected || !status.calibrated || status.running} onClick={send_trajetoria} > Preparar trajetória </button>
-          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current} onClick={toggle_play_pause}>
+          <button disabled={!status.running && (!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current)} onClick={toggle_play_pause}>
             {status.running ?
               <span><i class="bi bi-pause-circle"></i> Pause</span> :
-              <span><i class="bi bi-play-circle"></i> Play</span>}
+              <span><i class="bi bi-play-circle"></i> Play</span>
+            }
           </button>
           <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current || status.running} onClick={step}>
             <i class="bi bi-arrow-bar-right"></i> Step

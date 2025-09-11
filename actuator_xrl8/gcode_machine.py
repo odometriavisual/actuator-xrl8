@@ -109,6 +109,7 @@ class NullGcodeMachine:
         Returns true if calibration was finished
         """
         print("Recebido comando g28")
+        self.pos = np.array((100, 100), dtype=float)
         if self.g1(0, 0, 10):
             self.calibrated = True
             return True

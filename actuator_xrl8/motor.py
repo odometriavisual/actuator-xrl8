@@ -13,7 +13,6 @@ STEP_PIN_Y = 27  # Step pin for Y axis
 DIR_PIN_Y = 17  # Direction pin for Y axis
 
 # Endstop pins
-BUTTON = 14
 ENDSTOP_X_MIN = 15  # Endstop for X min
 ENDSTOP_X_MAX = 18  # Endstop for X max
 ENDSTOP_Y_MIN = 23  # Endstop for Y min
@@ -57,7 +56,6 @@ class MotorGcodeMachine(NullGcodeMachine):
             GPIO.setup(ENDSTOP_X_MAX, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             GPIO.setup(ENDSTOP_Y_MIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             GPIO.setup(ENDSTOP_Y_MAX, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.setup(BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
             # Initialize outputs
             GPIO.output(STEP_PIN_X, False)

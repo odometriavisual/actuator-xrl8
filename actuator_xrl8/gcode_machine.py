@@ -57,7 +57,7 @@ class NullGcodeMachine:
 
     def g2(self, x: float, y: float, s: float, r: float) -> bool:
         """
-        Clockwise arc movement. 
+        Clockwise arc movement.
         Returns false if movement was not finished
         Returns true if movement was finished
         """
@@ -77,7 +77,7 @@ class NullGcodeMachine:
 
     def g3(self, x: float, y: float, s: float, r: float) -> bool:
         """
-        Counterclockwise arc movement. 
+        Counterclockwise arc movement.
         Returns false if movement was not finished
         Returns true if movement was finished
         """

@@ -28,17 +28,20 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  justify-content: stretch;
 }
 
 .panel .tabs button {
-  width: 100%;
+  flex-grow: 2;
   border-radius: 8px;
   padding: 8px;
   text-align: center;
   background-color: var(--primary-alt-color);
   color: var(--on-primary-alt-color);
   user-select: none;
+}
+
+.panel .tabs button:last-child {
+  flex-grow: 1;
 }
 
 .panel .tabs button.selected {

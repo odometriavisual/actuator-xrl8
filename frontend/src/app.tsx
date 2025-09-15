@@ -2,9 +2,10 @@ import { useEffect, useRef, useState, type Dispatch, type StateUpdater } from 'p
 
 import { SvgWrap } from './svg_wrap.tsx';
 import { Trajetoria } from './trajetoria.tsx';
+import { Manual } from './manual.tsx';
+import { Settings } from './settings.tsx';
 
 import { socket } from './socket.tsx';
-import { Manual } from './manual.tsx';
 import { type TrajetoriaNode, CommandType, type Status } from './types.tsx';
 import './app.css'
 
@@ -17,7 +18,7 @@ export function App() {
   const is_dirty = useRef<boolean>(true);
 
   const setNodesStorage: Dispatch<StateUpdater<TrajetoriaNode[]>> = value => {
-    const next_ns = value instanceof Function? value(nodes): value;
+    const next_ns = value instanceof Function ? value(nodes) : value;
     next_ns[0].command.type = CommandType.Iniciar;
 
     localStorage.setItem('nodes', JSON.stringify(next_ns));
@@ -57,13 +58,16 @@ export function App() {
         <div className="tabs">
           <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
           <button className={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </button>
+          <button className={tab == 2 ? "selected" : ""} onClick={() => setTab(2)}> <i className={tab == 2 ? "bi bi-gear" : "bi bi-gear-fill"}></i> </button>
         </div>
         {
           tab == 0 ?
             <Trajetoria nodes={nodes} setNodes={setNodesStorage} nextId={nextId} setNextId={setNextId} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
             tab == 1 ?
               <Manual status={status} /> :
-              null
+              tab == 2 ?
+                <Settings /> :
+                null
         }
       </div>
       <SvgWrap nodes={nodes} setNodes={setNodesStorage} nextId={nextId} setNextId={setNextId} is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />

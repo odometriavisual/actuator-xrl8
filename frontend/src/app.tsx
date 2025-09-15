@@ -12,6 +12,7 @@ import { TrajetoriaContext } from './trajetoria_context.tsx';
 
 export function App() {
   const [tab, setTab] = useState<number>(0);
+  const [encoder_ip, setEncoder_ip] = useState<string>('rpi5-00.local');
 
   const [nodes, setNodes] = useState<Array<TrajetoriaNode>>(JSON.parse(localStorage.getItem("nodes") || "[]"));
   const [nextId, setNextId] = useState<number>(0);
@@ -60,7 +61,7 @@ export function App() {
   });
 
   return (
-    <TrajetoriaContext.Provider value={{ nodes, setNodes: setNodesStorage, getNextNodeId }}>
+    <TrajetoriaContext.Provider value={{ nodes, setNodes: setNodesStorage, getNextNodeId, encoder_ip, setEncoder_ip }}>
       <div className="wrap">
         <div className="panel">
           <div className="tabs">

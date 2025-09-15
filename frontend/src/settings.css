@@ -1,0 +1,22 @@
+.settings {
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: space-around;
+  gap: 8px;
+}
+
+.settings label {
+  width: 100%;
+  justify-content: begin;
+
+  display: flex;
+  gap: 8px;
+}
+
+.settings input,
+.settings textarea {
+  flex-grow: 1;
+}

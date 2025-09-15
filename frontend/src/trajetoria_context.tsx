@@ -6,12 +6,16 @@ export type TrajetoriaContextType = {
   nodes: TrajetoriaNode[],
   setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
   getNextNodeId: () => number,
+  encoder_ip: string,
+  setEncoder_ip: Dispatch<StateUpdater<string>>,
 };
 
 export const TrajetoriaContext = createContext<TrajetoriaContextType>({
   nodes: [],
   setNodes: _ns => {},
   getNextNodeId: () => 0,
+  encoder_ip: '',
+  setEncoder_ip: () => {},
 });
 
 export function useTrajetoria() {

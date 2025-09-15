@@ -8,6 +8,7 @@ import { Settings } from './settings.tsx';
 import { socket } from './socket.tsx';
 import { type TrajetoriaNode, CommandType, type Status } from './types.tsx';
 import './app.css'
+import { TrajetoriaContext } from './trajetoria_context.tsx';
 
 export function App() {
   const [tab, setTab] = useState<number>(0);
@@ -23,6 +24,12 @@ export function App() {
 
     localStorage.setItem('nodes', JSON.stringify(next_ns));
     setNodes(next_ns);
+  };
+
+  const getNextNodeId = () => {
+    const id = nextId;
+    setNextId(prev => prev + 1);
+    return id;
   };
 
   const bounds = {
@@ -53,24 +60,26 @@ export function App() {
   });
 
   return (
-    <div className="wrap">
-      <div className="panel">
-        <div className="tabs">
-          <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
-          <button className={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </button>
-          <button className={tab == 2 ? "selected" : ""} onClick={() => setTab(2)}> <i className={tab == 2 ? "bi bi-gear" : "bi bi-gear-fill"}></i> </button>
+    <TrajetoriaContext.Provider value={{ nodes, setNodes: setNodesStorage, getNextNodeId }}>
+      <div className="wrap">
+        <div className="panel">
+          <div className="tabs">
+            <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
+            <button className={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </button>
+            <button className={tab == 2 ? "selected" : ""} onClick={() => setTab(2)}> <i className={tab == 2 ? "bi bi-gear" : "bi bi-gear-fill"}></i> </button>
+          </div>
+          {
+            tab == 0 ?
+              <Trajetoria is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
+              tab == 1 ?
+                <Manual status={status} /> :
+                tab == 2 ?
+                  <Settings /> :
+                  null
+          }
         </div>
-        {
-          tab == 0 ?
-            <Trajetoria nodes={nodes} setNodes={setNodesStorage} nextId={nextId} setNextId={setNextId} is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
-            tab == 1 ?
-              <Manual status={status} /> :
-              tab == 2 ?
-                <Settings /> :
-                null
-        }
+        <SvgWrap is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />
       </div>
-      <SvgWrap nodes={nodes} setNodes={setNodesStorage} nextId={nextId} setNextId={setNextId} is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />
-    </div>
+    </TrajetoriaContext.Provider>
   )
 }

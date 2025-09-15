@@ -1,21 +1,19 @@
-import { useRef, type Dispatch, type MutableRef, type StateUpdater } from "preact/hooks";
+import { useRef, type MutableRef } from "preact/hooks";
 
 import { CommandType, find_last_movement_node_before, type Bounds, type Status, type TrajetoriaNode } from './types.tsx';
 import './svg_wrap.css'
+import { useTrajetoria } from "./trajetoria_context.tsx";
 
 type SvgWrapArgs = {
-  nodes: Array<TrajetoriaNode>,
-  setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
-  nextId: number,
-  setNextId: Dispatch<StateUpdater<number>>,
   is_dirty: MutableRef<boolean>,
   status: Status,
   offset: { x: number, y: number },
   bounds: Bounds,
 }
 
-export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, offset, bounds }: SvgWrapArgs) {
+export function SvgWrap({ is_dirty, status, offset, bounds }: SvgWrapArgs) {
   const dragInfo = useRef<any>(null);
+  const { nodes, setNodes, getNextNodeId } = useTrajetoria();
 
   function make_arrow(type: number, r: number, a: { x: number; y: number; }, b: { x: number; y: number; }) {
     const startX = a.x;
@@ -73,13 +71,12 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
     const nx = Math.max(Math.min(Math.round((pt.x - offset.x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
     const ny = Math.max(Math.min(Math.round((pt.y - offset.y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
 
-    let next = { id: nextId, command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 100 } };
+    let next = { id: getNextNodeId(), command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 100 } };
 
     setNodes(prev => {
       is_dirty.current = true;
       return [...prev, next];
     });
-    setNextId(id => id + 1);
   };
 
 
@@ -105,8 +102,8 @@ export function SvgWrap({ nodes, setNodes, nextId, setNextId, is_dirty, status, 
       const command_type = copy[i].command.type;
 
       if (command_type === CommandType.Arco_horario || command_type === CommandType.Arco_antihorario) {
-        const {command: {x, y}} = find_last_movement_node_before(i, copy);
-        const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2))*500/2)/500;
+        const { command: { x, y } } = find_last_movement_node_before(i, copy);
+        const min_r = Math.ceil(Math.sqrt(Math.pow(nx - x, 2) + Math.pow(ny - y, 2)) * 500 / 2) / 500;
         copy[i].command.x = nx;
         copy[i].command.y = ny;
         copy[i].command.r = min_r;

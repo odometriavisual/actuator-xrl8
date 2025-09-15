@@ -1,6 +1,9 @@
+import { useTrajetoria } from "./trajetoria_context";
 
 export function Settings() {
+  const { nodes } = useTrajetoria();
+
   return (
-    <h1> 123 </h1>
+    <textarea> {nodes} </textarea>
   );
 }

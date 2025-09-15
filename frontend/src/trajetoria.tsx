@@ -4,12 +4,9 @@ import "bootstrap-icons/font/bootstrap-icons.css"
 import { socket } from './socket.tsx'
 import { CommandType, find_last_movement_node_before, type Bounds, type Status, type TrajetoriaNode } from './types.tsx'
 import './trajetoria.css'
+import { useTrajetoria } from './trajetoria_context.tsx'
 
 type TrajetoriaArgs = {
-  nodes: Array<TrajetoriaNode>,
-  setNodes: Dispatch<StateUpdater<TrajetoriaNode[]>>,
-  nextId: number,
-  setNextId: Dispatch<StateUpdater<number>>,
   is_dirty: MutableRef<boolean>,
   status: Status,
   offset: { x: number, y: number },
@@ -86,8 +83,9 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
 }
 
 
-export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, status, offset, setOffset, bounds }: TrajetoriaArgs) {
+export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: TrajetoriaArgs) {
   const rowDragIndex = useRef<number | null>(null);
+  const { nodes, setNodes, getNextNodeId } = useTrajetoria();
 
   function add_node(e: Event) {
     e.preventDefault();
@@ -95,7 +93,7 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
     const last_args = rev_nodes.find(n => CommandType.is_movement(n.command.type))?.command || { x: 40, y: 10, s: 50 };
 
     let next = {
-      id: nextId, command: { type: CommandType.Linear, x: last_args.x + 10, y: last_args.y + 40, s: last_args.s, p: 1000, r: 100 }
+      id: getNextNodeId(), command: { type: CommandType.Linear, x: last_args.x + 10, y: last_args.y + 40, s: last_args.s, p: 1000, r: 100 }
     };
 
     if (next.command.y > bounds.height - 50) {
@@ -114,7 +112,6 @@ export function Trajetoria({ nodes, setNodes, nextId, setNextId, is_dirty, statu
       is_dirty.current = true;
       return [...prev, next];
     });
-    setNextId(id => id + 1);
   }
 
   function remove_node(e: Event, i: number) {

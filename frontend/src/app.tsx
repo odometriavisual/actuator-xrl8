@@ -49,7 +49,7 @@ export function App() {
   });
 
   useEffect(() => {
-    socket.on("status", (value: Status) => setStatus({ ...value, connected: true }));
+    socket.on("status", (value: Status) => setStatus(({ ...value, connected: true })));
     socket.on("connect", () => setStatus(prev => ({ ...prev, connected: true })));
     socket.on("disconnect", () => setStatus(prev => ({ ...prev, connected: false })));
 

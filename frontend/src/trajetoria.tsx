@@ -19,6 +19,9 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
   const update_y = (value: number) => update_node(i, { ...n, command: { ...n.command, y: value } });
   const update_s = (value: number) => update_node(i, { ...n, command: { ...n.command, s: value } });
   const update_p = (value: number) => update_node(i, { ...n, command: { ...n.command, p: value } });
+  const update_f = (value: number) => update_node(i, { ...n, command: { ...n.command, f: value } });
+  const update_e = (value: number) => update_node(i, { ...n, command: { ...n.command, e: value } });
+  const update_str = (value: number) => update_node(i, { ...n, command: { ...n.command, str: value } });
 
   const update_r = (value: number) => {
     const last_move_node = find_last_movement_node_before(i, nodes);
@@ -79,6 +82,25 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
       return (
         <label> <input type="number" min="0" step="1" value={n.command.p} onInput={(e: any) => update_p(parseInt(e.target.value))} /> </label>
       );
+    case CommandType.Start_acquisition:
+      return (
+        <>
+          <label> <input type="number" step="0.1" value={n.command.f} onInput={(e: any) => update_f(parseFloat(e.target.value))} /> </label>
+          <label> <input type="text" value={n.command.str} onInput={(e: any) => update_str(e.target.value)} /> </label>
+        </>
+      );
+    case CommandType.Stop_acquisition:
+      return null;
+    case CommandType.Start_stream:
+      return null;
+    case CommandType.Stop_stream:
+      return null;
+    case CommandType.Set_exposure:
+      return (
+        <>
+          <label> <input type="number" step="0.1" value={n.command.e} onInput={(e: any) => update_e(parseFloat(e.target.value))} /> </label>
+        </>
+      );
   }
 }
 
@@ -93,7 +115,7 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
     const last_args = rev_nodes.find(n => CommandType.is_movement(n.command.type))?.command || { x: 40, y: 10, s: 50 };
 
     let next = {
-      id: getNextNodeId(), command: { type: CommandType.Linear, x: last_args.x + 10, y: last_args.y + 40, s: last_args.s, p: 1000, r: 100 }
+      id: getNextNodeId(), command: { type: CommandType.Linear, x: last_args.x + 10, y: last_args.y + 40, s: last_args.s, p: 1000, r: 100, f: 10, str: "", e: 500 }
     };
 
     if (next.command.y > bounds.height - 50) {
@@ -159,6 +181,21 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
 
         case CommandType.Sleep:
           return `G4 P${n.command.p}`;
+
+        case CommandType.Start_acquisition:
+          return `M1000 F${n.command.f} "${n.command.str}"`;
+
+        case CommandType.Stop_acquisition:
+          return `M1001`;
+
+        case CommandType.Start_stream:
+          return `M1002`;
+
+        case CommandType.Stop_stream:
+          return `M1003`;
+
+        case CommandType.Set_exposure:
+          return `M1004 E${n.command.e}`;
       }
 
     }).join('\n');
@@ -264,6 +301,11 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
                       <option value={CommandType.Arco_horario}> Arco 1 ↷ </option>
                       <option value={CommandType.Arco_antihorario}> Arco 2 ↶ </option>
                       <option value={CommandType.Sleep}> Sleep </option>
+                      <option value={CommandType.Start_acquisition}> Iniciar Aquisição </option>
+                      <option value={CommandType.Stop_acquisition}> Parar Aquisição </option>
+                      <option value={CommandType.Set_exposure}> Setar Exposição </option>
+                      <option value={CommandType.Start_stream}> Iniciar Stream </option>
+                      <option value={CommandType.Stop_stream}> Parar Stream </option>
                     </>
                   }
                 </select>

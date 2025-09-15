@@ -4,9 +4,24 @@ export const CommandType = {
   Sleep: 1,
   Arco_horario: 2,
   Arco_antihorario: 3,
+  Start_acquisition: 1000,
+  Stop_acquisition: 1001,
+  Start_stream: 1002,
+  Stop_stream: 1003,
+  Set_exposure: 1004,
   is_movement: (n: number) => n === CommandType.Iniciar || n === CommandType.Linear || n === CommandType.Arco_horario || n == CommandType.Arco_antihorario,
 };
-export type CommandData = { type: number; x: number; r: number; y: number; s: number; p: number; };
+export type CommandData = {
+  type: number,
+  x: number,
+  y: number,
+  r: number,
+  s: number,
+  p: number,
+  f: number,
+  str: string,
+  e: number,
+};
 
 export type TrajetoriaNode = { id: number; command: CommandData; };
 export type Status = {

@@ -71,7 +71,7 @@ export function SvgWrap({ is_dirty, status, offset, bounds }: SvgWrapArgs) {
     const nx = Math.max(Math.min(Math.round((pt.x - offset.x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
     const ny = Math.max(Math.min(Math.round((pt.y - offset.y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
 
-    let next = { id: getNextNodeId(), command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 100 } };
+    let next = { id: getNextNodeId(), command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 100, f: 10, e: 500, str: "" } };
 
     setNodes(prev => {
       is_dirty.current = true;

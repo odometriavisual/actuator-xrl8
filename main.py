@@ -20,6 +20,10 @@ def main():
     def index():
         return send_from_directory("../frontend/dist", "index.html")
 
+    @ws.on("connect")
+    def connect():
+        ws.emit("status", app.get_status())
+
     @ws.on("gcode")
     def gcode(gcode_src):
         app.initialize_trajectory(gcode_src)
@@ -37,14 +41,12 @@ def main():
         app.pause()
 
     def send_status():
+        last_status = app.get_status()
         while True:
-            status = {
-                "running": app.is_running(),
-                "gcode_loaded": app.is_trajectory_initialized(),
-                "pos": app.machine.get_position(),
-                "calibrated": app.is_calibrated(),
-            }
-            ws.emit("status", status)
+            status = app.get_status()
+            if last_status != status:
+                ws.emit("status", status)
+                last_status = status
             sleep(1 / 30)
 
     Thread(target=send_status, daemon=True).start()

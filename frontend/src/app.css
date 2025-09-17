@@ -9,7 +9,7 @@
 }
 
 .panel {
-  flex-grow: 2;
+  width: 520px;
 
   display: flex;
   flex-direction: column;

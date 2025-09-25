@@ -15,7 +15,7 @@ export function App() {
   const [encoder_ip, setEncoder_ip] = useState<string>('rpi5-00.local');
 
   const [nodes, setNodes] = useState<Array<TrajetoriaNode>>(JSON.parse(localStorage.getItem("nodes") || "[]"));
-  const [nextId, setNextId] = useState<number>(0);
+  const [nextId, setNextId] = useState<number>(Math.max(...nodes.map(n => n.id)));
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const is_dirty = useRef<boolean>(true);
 

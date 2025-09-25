@@ -86,7 +86,7 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
       return (
         <>
           <label> <input type="number" step="0.1" value={n.command.f} onInput={(e: any) => update_f(parseFloat(e.target.value))} /> </label>
-          <label> <input type="text" value={n.command.str} onInput={(e: any) => update_str(e.target.value)} /> </label>
+          <label style="grid-area: auto / auto / span 1 / span 3;"> <input type="text" value={n.command.str} onInput={(e: any) => update_str(e.target.value)} /> </label>
         </>
       );
     case CommandType.Stop_acquisition:

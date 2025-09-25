@@ -297,15 +297,20 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
                     <option value={CommandType.Iniciar}> Iniciar </option>
                     :
                     <>
-                      <option value={CommandType.Linear}> Linear </option>
-                      <option value={CommandType.Arco_horario}> Arco 1 ↷ </option>
-                      <option value={CommandType.Arco_antihorario}> Arco 2 ↶ </option>
-                      <option value={CommandType.Sleep}> Sleep </option>
-                      <option value={CommandType.Start_acquisition}> Iniciar Aquisição </option>
-                      <option value={CommandType.Stop_acquisition}> Parar Aquisição </option>
-                      <option value={CommandType.Set_exposure}> Setar Exposição </option>
-                      <option value={CommandType.Start_stream}> Iniciar Stream </option>
-                      <option value={CommandType.Stop_stream}> Parar Stream </option>
+                      <optgroup label="Movimento">
+                        <option value={CommandType.Linear}> Linear </option>
+                        <option value={CommandType.Arco_horario}> Arco 1 ↷ </option>
+                        <option value={CommandType.Arco_antihorario}> Arco 2 ↶ </option>
+                        <option value={CommandType.Sleep}> Sleep </option>
+                      </optgroup>
+                      <hr/>
+                      <optgroup label="Encoder Virtual">
+                        <option value={CommandType.Start_acquisition}> Iniciar Aquisição </option>
+                        <option value={CommandType.Stop_acquisition}> Parar Aquisição </option>
+                        <option value={CommandType.Set_exposure}> Setar Exposição </option>
+                        <option value={CommandType.Start_stream}> Iniciar Stream </option>
+                        <option value={CommandType.Stop_stream}> Parar Stream </option>
+                      </optgroup>
                     </>
                   }
                 </select>

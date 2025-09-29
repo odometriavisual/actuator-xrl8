@@ -23,6 +23,11 @@ export function Manual({ status }: ManualParams) {
     setTarget(prev => {return {x: prev.x, y: value};});
   };
 
+  function setStepSizeRound(value: number) {
+    value = Math.round(value*5)/5;
+    setStepSize(value);
+  }
+
   function goto() {
     socket.emit("gcode", `G0 X${target.x} Y${target.y}`)
   }
@@ -74,25 +79,15 @@ export function Manual({ status }: ManualParams) {
           <i class="bi bi-arrow-down"></i>
         </button>
       </div>
+      <label className="manual-multiplier">
+        <span>Tamanho do passo:</span>
+        <input type="number" step="0.2" value={stepSize} onInput={(e: any) => setStepSizeRound(parseFloat(e.target.value))}/>
+      </label>
       <label className="manual-goto">
         <input type="number" step="0.2" placeholder="x" value={target.x} onInput={(e: any) => setTargetX(parseFloat(e.target.value))}></input>
         <input type="number" step="0.2" placeholder="y" value={target.y} onInput={(e: any) => setTargetY(parseFloat(e.target.value))}></input>
-        <button onInput={() => goto()}>Go to</button>
+        <button onClick={() => goto()}>Go to</button>
       </label>
-      <fieldset className="manual-multiplier">
-        <label>
-          <input type="radio" id="1" name="step-size" value="1" checked={stepSize === 1} onClick={() => setStepSize(1)} />
-          x1
-        </label>
-        <label>
-          <input type="radio" id="10" name="step-size" value="10" checked={stepSize === 10} onClick={() => setStepSize(10)} />
-          x10
-        </label>
-        <label>
-          <input type="radio" id="100" name="step-size" value="100" checked={stepSize === 100} onClick={() => setStepSize(100)} />
-          x100
-        </label>
-      </fieldset>
     </>
   );
 }

@@ -37,12 +37,13 @@
 .manual-goto {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   gap: 12px;
 }
 
 .manual-goto input {
   min-width: 0px;
-  flex-grow: 0;
+  flex-grow: 1;
   flex-shrink: 1;
 }
 

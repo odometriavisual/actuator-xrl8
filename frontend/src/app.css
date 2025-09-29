@@ -7,6 +7,12 @@
   box-sizing: border-box;
 }
 
+@media all and (max-width: 1000px) {
+  .wrap {
+    flex-direction: column;
+  }
+}
+
 .panel {
   width: 100%;
 

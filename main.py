@@ -1,16 +1,20 @@
 from flask import send_from_directory
 from flask_socketio import SocketIO
+import numpy as np
 
 from threading import Thread
-from time import sleep
+from time import sleep, time_ns
 
 try:
     from actuator_xrl8.button import start_button_thread
 except RuntimeError:
+
     def start_button_thread(app):
         pass
 
+
 from actuator_xrl8.actuator_app import ActuatorApp
+
 
 def main():
     app = ActuatorApp()
@@ -42,11 +46,22 @@ def main():
 
     def send_status():
         last_status = app.get_status()
+        data = []
+
         while True:
             status = app.get_status()
+
             if last_status != status:
+                if not last_status["running"] and status["running"]:
+                    data = []
+                elif status["running"]:
+                    data.append([time_ns(), *status["pos"]])
+                elif last_status["running"] and not status["running"]:
+                    np.savez("/tmp/trajectory.npz", data)
+
                 ws.emit("status", status)
                 last_status = status
+
             sleep(1 / 30)
 
     Thread(target=send_status, daemon=True).start()

@@ -1,4 +1,4 @@
-import { useRef, type Dispatch, type MutableRef, type StateUpdater } from 'preact/hooks'
+import { useRef, type Dispatch, type StateUpdater } from 'preact/hooks'
 import "bootstrap-icons/font/bootstrap-icons.css"
 
 import { socket } from './socket.tsx'
@@ -7,7 +7,6 @@ import './trajetoria.css'
 import { useTrajetoria } from './trajetoria_context.tsx'
 
 type TrajetoriaArgs = {
-  is_dirty: MutableRef<boolean>,
   status: Status,
   offset: { x: number, y: number },
   setOffset: Dispatch<StateUpdater<{ x: number, y: number }>>,
@@ -107,9 +106,9 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
 }
 
 
-export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: TrajetoriaArgs) {
+export function Trajetoria({ status, offset, setOffset, bounds }: TrajetoriaArgs) {
   const rowDragIndex = useRef<number | null>(null);
-  const { nodes, setNodes, getNextNodeId } = useTrajetoria();
+  const { is_dirty, setIsDirty, nodes, setNodes, getNextNodeId } = useTrajetoria();
 
   function add_node(e: Event) {
     e.preventDefault();
@@ -132,10 +131,8 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
       next.command.type = CommandType.Iniciar;
     }
 
-    setNodes(prev => {
-      is_dirty.current = true;
-      return [...prev, next];
-    });
+    setNodes(prev =>  [...prev, next]);
+    setIsDirty(true);
   }
 
   function remove_node(e: Event, i: number) {
@@ -145,7 +142,7 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
       const next = [...prev];
       next.splice(i, 1);
 
-      is_dirty.current = true;
+      setIsDirty(true);
       return next;
     })
   }
@@ -158,7 +155,7 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
       nodes[i].command.x = Math.max(Math.min(Math.round((nodes[i].command.x) * 5) / 5, bounds.x0 + bounds.width), bounds.x0) - offset.x;
       nodes[i].command.y = Math.max(Math.min(Math.round((nodes[i].command.y) * 5) / 5, bounds.y0 + bounds.height), bounds.y0) - offset.y;
 
-      is_dirty.current = true;
+      setIsDirty(true);
       return nodes;
     });
   }
@@ -203,12 +200,12 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
     }).join('\n');
 
     socket.emit("gcode", gcode)
-    is_dirty.current = false;
+    setIsDirty(false);
   }
 
   function home() {
     socket.emit("gcode", "G28")
-    is_dirty.current = true;
+    setIsDirty(true);
   }
 
   function toggle_play_pause() {
@@ -330,13 +327,13 @@ export function Trajetoria({ is_dirty, status, offset, setOffset, bounds }: Traj
         <div className="controls">
           <button disabled={status.running} onClick={add_node} > + 1 </button>
           <button disabled={!status.connected || !status.calibrated || status.running} onClick={send_trajetoria} > Preparar trajetória </button>
-          <button disabled={!status.running && (!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current)} onClick={toggle_play_pause}>
+          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty} onClick={toggle_play_pause}>
             {status.running ?
               <span><i class="bi bi-pause-circle"></i> Pause</span> :
               <span><i class="bi bi-play-circle"></i> Play</span>
             }
           </button>
-          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty.current || status.running} onClick={step}>
+          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty || status.running} onClick={step}>
             <i class="bi bi-arrow-bar-right"></i> Step
           </button>
           <button disabled={!status.connected || status.running} onClick={home}>

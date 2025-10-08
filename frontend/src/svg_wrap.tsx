@@ -1,19 +1,18 @@
-import { useRef, type MutableRef } from "preact/hooks";
+import { useRef } from "preact/hooks";
 
 import { CommandType, find_last_movement_node_before, type Bounds, type Status, type TrajetoriaNode } from './types.tsx';
 import './svg_wrap.css'
 import { useTrajetoria } from "./trajetoria_context.tsx";
 
 type SvgWrapArgs = {
-  is_dirty: MutableRef<boolean>,
   status: Status,
   offset: { x: number, y: number },
   bounds: Bounds,
 }
 
-export function SvgWrap({ is_dirty, status, offset, bounds }: SvgWrapArgs) {
+export function SvgWrap({ status, offset, bounds }: SvgWrapArgs) {
   const dragInfo = useRef<any>(null);
-  const { nodes, setNodes, getNextNodeId } = useTrajetoria();
+  const { setIsDirty, nodes, setNodes, getNextNodeId } = useTrajetoria();
 
   function make_arrow(type: number, r: number, a: { x: number; y: number; }, b: { x: number; y: number; }) {
     const startX = a.x;
@@ -73,10 +72,8 @@ export function SvgWrap({ is_dirty, status, offset, bounds }: SvgWrapArgs) {
 
     let next = { id: getNextNodeId(), command: { type: CommandType.Linear, x: nx, y: ny, s: last.command.s, p: 1000, r: 100, f: 10, e: 500, str: "" } };
 
-    setNodes(prev => {
-      is_dirty.current = true;
-      return [...prev, next];
-    });
+    setNodes(prev => [...prev, next]);
+    setIsDirty(true);
   };
 
 
@@ -113,7 +110,7 @@ export function SvgWrap({ is_dirty, status, offset, bounds }: SvgWrapArgs) {
         copy[i].command.y = ny;
       }
 
-      is_dirty.current = true;
+      setIsDirty(true);
       return copy;
     });
   };

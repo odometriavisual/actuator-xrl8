@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type Dispatch, type StateUpdater } from 'preact/hooks';
+import { useEffect, useState, type Dispatch, type StateUpdater } from 'preact/hooks';
 
 import { SvgWrap } from './svg_wrap.tsx';
 import { Trajetoria } from './trajetoria.tsx';
@@ -18,7 +18,7 @@ export function App() {
   const [nodes, setNodes] = useState<Array<TrajetoriaNode>>(JSON.parse(localStorage.getItem("nodes") || "[]"));
   const [nextId, setNextId] = useState<number>(Math.max(...nodes.map(n => n.id)) + 1);
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
-  const is_dirty = useRef<boolean>(true);
+  const [is_dirty, setIsDirty] = useState<boolean>(true);
 
   const setNodesStorage: Dispatch<StateUpdater<TrajetoriaNode[]>> = value => {
     const next_ns = value instanceof Function ? value(nodes) : value;
@@ -62,7 +62,7 @@ export function App() {
   });
 
   return (
-    <TrajetoriaContext.Provider value={{ nodes, setNodes: setNodesStorage, getNextNodeId, encoder_ip, setEncoder_ip }}>
+    <TrajetoriaContext.Provider value={{ is_dirty, setIsDirty, nodes, setNodes: setNodesStorage, getNextNodeId, encoder_ip, setEncoder_ip }}>
       <div className="wrap">
         <div className="panel">
           <div className="tabs">
@@ -72,7 +72,7 @@ export function App() {
           </div>
           {
             tab == 0 ?
-              <Trajetoria is_dirty={is_dirty} status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
+              <Trajetoria status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
               tab == 1 ?
                 <Manual status={status} /> :
                 tab == 2 ?
@@ -80,7 +80,7 @@ export function App() {
                   null
           }
         </div>
-        <SvgWrap is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />
+        <SvgWrap status={status} offset={offset} bounds={bounds} />
       </div>
       <PositionDisplay pos={status.pos} />
     </TrajetoriaContext.Provider>

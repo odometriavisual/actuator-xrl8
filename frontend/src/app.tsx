@@ -9,13 +9,14 @@ import { socket } from './socket.tsx';
 import { type TrajetoriaNode, CommandType, type Status } from './types.tsx';
 import './app.css'
 import { TrajetoriaContext } from './trajetoria_context.tsx';
+import { PositionDisplay } from './position_diplay.tsx';
 
 export function App() {
   const [tab, setTab] = useState<number>(0);
   const [encoder_ip, setEncoder_ip] = useState<string>('rpi5-00.local');
 
   const [nodes, setNodes] = useState<Array<TrajetoriaNode>>(JSON.parse(localStorage.getItem("nodes") || "[]"));
-  const [nextId, setNextId] = useState<number>(Math.max(...nodes.map(n => n.id))+1);
+  const [nextId, setNextId] = useState<number>(Math.max(...nodes.map(n => n.id)) + 1);
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const is_dirty = useRef<boolean>(true);
 
@@ -81,6 +82,7 @@ export function App() {
         </div>
         <SvgWrap is_dirty={is_dirty} status={status} offset={offset} bounds={bounds} />
       </div>
+      <PositionDisplay pos={status.pos} />
     </TrajetoriaContext.Provider>
   )
 }

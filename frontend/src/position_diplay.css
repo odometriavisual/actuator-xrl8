@@ -1,0 +1,17 @@
+.pos-display {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  background-color: var(--surface-color);
+  color: var(--on-surface-color);
+
+  padding: 8px;
+}
+
+.pos-display span {
+  user-select: all;
+  cursor: pointer;
+}

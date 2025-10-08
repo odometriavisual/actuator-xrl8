@@ -80,12 +80,12 @@ export function Manual({ status }: ManualParams) {
         </button>
       </div>
       <label className="manual-multiplier">
-        <span>Tamanho do passo:</span>
+        <span>Tamanho do passo (mm):</span>
         <input type="number" step="0.2" value={stepSize} onInput={(e: any) => setStepSizeRound(parseFloat(e.target.value))}/>
       </label>
       <label className="manual-goto">
         <input type="number" step="0.2" placeholder="x" value={target.x} onInput={(e: any) => setTargetX(parseFloat(e.target.value))}></input>
-        <input type="number" step="0.2" placeholder="y" value={target.y} onInput={(e: any) => setTargetY(parseFloat(e.target.value))}></input>
+        <input type="number" step="0.2" placeholder="y" value={target.y} onSubmit={console.log} onInput={(e: any) => setTargetY(parseFloat(e.target.value))}></input>
         <button onClick={() => goto()}>Go to</button>
       </label>
     </>

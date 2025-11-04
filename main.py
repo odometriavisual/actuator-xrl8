@@ -44,6 +44,11 @@ def main():
     def pause():
         app.pause()
 
+    @ws.on("shutdown")
+    def shutdown():
+        import os
+        os.system("sudo shutdown now -P")
+
     def send_status():
         last_status = app.get_status()
         data = []

@@ -327,7 +327,7 @@ export function Trajetoria({ status, offset, setOffset, bounds }: TrajetoriaArgs
         <div className="controls">
           <button disabled={status.running} onClick={add_node} > + 1 </button>
           <button disabled={!status.connected || !status.calibrated || status.running} onClick={send_trajetoria} > Preparar trajetória </button>
-          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || is_dirty} onClick={toggle_play_pause}>
+          <button disabled={!status.connected || !status.calibrated || !status.gcode_loaded || (is_dirty && !status.running)} onClick={toggle_play_pause}>
             {status.running ?
               <span><i class="bi bi-pause-circle"></i> Pause</span> :
               <span><i class="bi bi-play-circle"></i> Play</span>

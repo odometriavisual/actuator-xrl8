@@ -78,13 +78,15 @@ export function SvgWrap({ status, offset, bounds }: SvgWrapArgs) {
 
 
   const onPointerDown = (e: PointerEvent, i: number) => {
-    const pt = getSvgPoint(e);
-    dragInfo.current = {
-      i,
-      offsetX: nodes[i].command.x + offset.x - pt.x,
-      offsetY: nodes[i].command.y + offset.y - pt.y
-    };
-    (e.target as Element).setPointerCapture(e.pointerId);
+    if (!status.running) {
+      const pt = getSvgPoint(e);
+      dragInfo.current = {
+        i,
+        offsetX: nodes[i].command.x + offset.x - pt.x,
+        offsetY: nodes[i].command.y + offset.y - pt.y
+      };
+      (e.target as Element).setPointerCapture(e.pointerId);
+    }
   };
 
   const onPointerMove = (e: PointerEvent) => {
@@ -153,7 +155,7 @@ export function SvgWrap({ status, offset, bounds }: SvgWrapArgs) {
               <circle cx={n[0].command.x + offset.x} cy={n[0].command.y + offset.y} r={4.5}
                 fill="var(--on-surface-color)"
                 filter="url(#shadow)"
-                style="cursor:grab" />
+                style={status.running ? "cursor: not-allowed" : "cursor: grab"} />
             </g>
           ))}
         </g>

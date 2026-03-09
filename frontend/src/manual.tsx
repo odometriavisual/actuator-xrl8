@@ -1,30 +1,31 @@
-import { useState } from 'preact/hooks';
 import "bootstrap-icons/font/bootstrap-icons.css"
+import type { Dispatch, StateUpdater } from "preact/hooks";
 
 import { socket } from './socket';
 import type { Status } from './types.tsx';
 import './manual.css'
 
 type ManualParams = {
-  status: Status
+  status: Status,
+  stepSize: number,
+  setStepSize: Dispatch<StateUpdater<number>>,
+  target: { x: number, y: number },
+  setTarget: Dispatch<StateUpdater<{ x: number, y: number }>>,
 };
 
-export function Manual({ status }: ManualParams) {
-  const [stepSize, setStepSize] = useState<number>(1);
-  const [target, setTarget] = useState<{x: number, y: number}>({x: 0, y: 0});
-
+export function Manual({ status, stepSize, setStepSize, target, setTarget }: ManualParams) {
   function setTargetX(value: number) {
-    value = Math.round(value*5)/5;
-    setTarget(prev => {return {x: value, y: prev.y};});
+    value = Math.round(value * 5) / 5;
+    setTarget(prev => { return { x: value, y: prev.y }; });
   };
 
   function setTargetY(value: number) {
-    value = Math.round(value*5)/5;
-    setTarget(prev => {return {x: prev.x, y: value};});
+    value = Math.round(value * 5) / 5;
+    setTarget(prev => { return { x: prev.x, y: value }; });
   };
 
   function setStepSizeRound(value: number) {
-    value = Math.round(value*5)/5;
+    value = Math.round(value * 5) / 5;
     setStepSize(value);
   }
 
@@ -81,7 +82,7 @@ export function Manual({ status }: ManualParams) {
       </div>
       <label className="manual-multiplier">
         <span>Tamanho do passo (mm):</span>
-        <input type="number" step="0.2" value={stepSize} onInput={(e: any) => setStepSizeRound(parseFloat(e.target.value))}/>
+        <input type="number" step="0.2" value={stepSize} onInput={(e: any) => setStepSizeRound(parseFloat(e.target.value))} />
       </label>
       <label className="manual-goto">
         <input type="number" step="0.2" placeholder="x" value={target.x} onInput={(e: any) => setTargetX(parseFloat(e.target.value))}></input>

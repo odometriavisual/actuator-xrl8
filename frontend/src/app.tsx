@@ -20,6 +20,9 @@ export function App() {
   const [offset, setOffset] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
   const [is_dirty, setIsDirty] = useState<boolean>(true);
 
+  const [stepSize, setStepSize] = useState<number>(1);
+  const [target, setTarget] = useState<{x: number, y: number}>({x: 0, y: 0});
+
   const setNodesStorage: Dispatch<StateUpdater<TrajetoriaNode[]>> = value => {
     const next_ns = value instanceof Function ? value(nodes) : value;
     next_ns[0].command.type = CommandType.Iniciar;
@@ -74,7 +77,7 @@ export function App() {
             tab == 0 ?
               <Trajetoria status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
               tab == 1 ?
-                <Manual status={status} /> :
+                <Manual status={status} stepSize={stepSize} setStepSize={setStepSize} target={target} setTarget={setTarget}/> :
                 tab == 2 ?
                   <Settings /> :
                   null

@@ -15,12 +15,10 @@ type ManualParams = {
 
 export function Manual({ status, stepSize, setStepSize, target, setTarget }: ManualParams) {
   function setTargetX(value: number) {
-    value = Math.round(value * 5) / 5;
     setTarget(prev => { return { x: value, y: prev.y }; });
   };
 
   function setTargetY(value: number) {
-    value = Math.round(value * 5) / 5;
     setTarget(prev => { return { x: prev.x, y: value }; });
   };
 
@@ -82,11 +80,11 @@ export function Manual({ status, stepSize, setStepSize, target, setTarget }: Man
       </div>
       <label className="manual-multiplier">
         <span>Tamanho do passo (mm):</span>
-        <input type="number" step="0.2" value={stepSize} onInput={(e: any) => setStepSizeRound(parseFloat(e.target.value))} />
+        <input type="number" step="0.2" value={stepSize} onChange={(e: any) => setStepSizeRound(parseFloat(e.target.value))} />
       </label>
       <label className="manual-goto">
-        <input type="number" step="0.2" placeholder="x" value={target.x} onInput={(e: any) => setTargetX(parseFloat(e.target.value))}></input>
-        <input type="number" step="0.2" placeholder="y" value={target.y} onSubmit={console.log} onInput={(e: any) => setTargetY(parseFloat(e.target.value))}></input>
+        <input type="number" step="0.2" placeholder="x" value={target.x} onChange={(e: any) => setTargetX(parseFloat(e.target.value))}></input>
+        <input type="number" step="0.2" placeholder="y" value={target.y} onSubmit={console.log} onChange={(e: any) => setTargetY(parseFloat(e.target.value))}></input>
         <button onClick={() => goto()}>Go to</button>
       </label>
     </>

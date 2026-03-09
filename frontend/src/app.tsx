@@ -21,7 +21,20 @@ export function App() {
   const [is_dirty, setIsDirty] = useState<boolean>(true);
 
   const [stepSize, setStepSize] = useState<number>(1);
-  const [target, setTarget] = useState<{x: number, y: number}>({x: 0, y: 0});
+  const [target, setTarget] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
+
+  const setStepSizeRound: Dispatch<StateUpdater<number>> = s => {
+    const next_s = s instanceof Function ? s(stepSize) : s;
+    setStepSize(Math.round(next_s * 5) / 5);
+  };
+
+  const setTargetRound: Dispatch<StateUpdater<{ x: number, y: number }>> = t => {
+    const next_target = t instanceof Function ? t(target) : t;
+
+    const x = Math.round(next_target.x * 5) / 5
+    const y = Math.round(next_target.y * 5) / 5
+    setTarget({ x, y });
+  };
 
   const setNodesStorage: Dispatch<StateUpdater<TrajetoriaNode[]>> = value => {
     const next_ns = value instanceof Function ? value(nodes) : value;
@@ -77,7 +90,7 @@ export function App() {
             tab == 0 ?
               <Trajetoria status={status} offset={offset} setOffset={setOffset} bounds={bounds} /> :
               tab == 1 ?
-                <Manual status={status} stepSize={stepSize} setStepSize={setStepSize} target={target} setTarget={setTarget}/> :
+                <Manual status={status} stepSize={stepSize} setStepSize={setStepSizeRound} target={target} setTarget={setTargetRound} /> :
                 tab == 2 ?
                   <Settings /> :
                   null

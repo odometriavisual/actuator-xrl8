@@ -46,24 +46,24 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
     case CommandType.Iniciar:
       return (
         <>
-          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
-          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onChange={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onChange={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
         </>
       );
 
     case CommandType.Linear:
       return (
         <>
-          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
-          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onChange={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onChange={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
           <label> <input title="velocidade (mm/s)" type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
         </>
       );
     case CommandType.Arco_horario:
       return (
         <>
-          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
-          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onChange={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onChange={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
           <label> <input title="velocidade (mm/s)" type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
           <label> <input title="radio (mm)" type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
         </>
@@ -71,8 +71,8 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
     case CommandType.Arco_antihorario:
       return (
         <>
-          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onInput={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
-          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onInput={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
+          <label> <input title="x (mm)" type="number" step="0.2" value={n.command.x} onChange={(e: any) => update_x(parseFloat(e.target.value))} /> </label>
+          <label> <input title="y (mm)" type="number" step="0.2" value={n.command.y} onChange={(e: any) => update_y(parseFloat(e.target.value))} /> </label>
           <label> <input title="velocidade (mm/s)" type="number" step="1" value={n.command.s} onInput={(e: any) => update_s(parseFloat(e.target.value))} /> </label>
           <label> <input title="radio (mm)" type="number" step="0.2" value={n.command.r} onInput={(e: any) => update_r(parseFloat(e.target.value))} /> </label>
         </>

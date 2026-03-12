@@ -78,9 +78,8 @@
   z-index: 1;
   padding: 20px;
 
-  border: 1px solid var(--primary-color);
+  border: 4px solid var(--on-surface-color);
   border-radius: 8px;
-  box-shadow: 12px 12px var(--primary-color);
 
   background-color: var(--surface-color);
   color: var(--on-surface-color);
@@ -104,10 +103,10 @@
 }
 
 @keyframes toast-fadeout {
-  from {
-    top: 60px;
-    opacity: 1;
-  }
+  /* from { */
+  /* top: 60px; */
+  /* opacity: 1; */
+  /* } */
 
   to {
     top: -200px;

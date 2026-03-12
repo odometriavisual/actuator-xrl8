@@ -58,7 +58,7 @@ export function App() {
   };
 
   const [status, setStatus] = useState<Status>({
-    connected: false,
+    connected: true,
     running: false,
     gcode_loaded: false,
     pos: [0, 0],
@@ -66,20 +66,34 @@ export function App() {
   });
 
   useEffect(() => {
+    const t = setTimeout(() => setStatus(prev => ({ ...prev, connected: false })), 3000);
+
     socket.on("status", (value: Status) => setStatus(({ ...value, connected: true })));
-    socket.on("connect", () => setStatus(prev => ({ ...prev, connected: true })));
     socket.on("disconnect", () => setStatus(prev => ({ ...prev, connected: false })));
+
+    socket.on("connect", () => {
+      clearTimeout(t);
+      setStatus(prev => ({ ...prev, connected: true }))
+    });
 
     return () => {
       socket.off("status");
       socket.off("connect");
       socket.off("disconnect");
     };
-  });
+  }, []);
+
 
   return (
     <TrajetoriaContext.Provider value={{ is_dirty, setIsDirty, nodes, setNodes: setNodesStorage, getNextNodeId, encoder_ip, setEncoder_ip }}>
       <div className="wrap">
+        <div className={`toast-wrap${status.connected ? "" : " show"}`}>
+          <div className="toast-connect">
+            <span>Erro ao conectar-se com o atuador, tentando novamente...</span>
+            <div className="loader"></div>
+          </div>
+        </div>
+
         <div className="panel">
           <div className="tabs">
             <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>

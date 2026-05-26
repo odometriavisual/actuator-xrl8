@@ -27,6 +27,7 @@ def main():
     @ws.on("connect")
     def connect():
         ws.emit("status", app.get_status())
+        ws.emit("encoder_host", app.machine.encoder.host)
 
     @ws.on("gcode")
     def gcode(gcode_src):
@@ -48,6 +49,10 @@ def main():
     def shutdown():
         import os
         os.system("sudo shutdown now -P")
+
+    @ws.on("set_encoder_host")
+    def set_encoder_host(host):
+        app.set_encoder_host(ws, host)
 
     def send_status():
         last_status = app.get_status()

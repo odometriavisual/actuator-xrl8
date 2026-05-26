@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 
 from time import sleep
 
-from actuator_xrl8 import virtual_encoder_api as encoder
+from actuator_xrl8.virtual_encoder_api import EncoderApi
 
 
 class NullGcodeMachine:
@@ -11,6 +11,7 @@ class NullGcodeMachine:
         self.pos = np.array([0, 0], dtype=float)
         self.pause_requested = False
         self.calibrated = False
+        self.encoder = EncoderApi("virtual-encoder.local")
 
     def is_calibrated(self):
         "Returns true after homing"
@@ -132,28 +133,28 @@ class NullGcodeMachine:
         """
         Start encoder. Sends the command `start_acquisition` to the virtual encoder.
         """
-        encoder.start_acquisition(pulses_per_second=f, reason=acquisition_name)
+        self.encoder.start_acquisition(pulses_per_second=f, reason=acquisition_name)
 
     def m1001(self):
         """
         Stop encoder. Sends the command `stop_acquisition` to the virtual encoder.
         """
-        encoder.stop_acquisition()
+        self.encoder.stop_acquisition()
 
     def m1002(self):
         """
         Streaming on. Sends the command `start_stream` to the virtual encoder.
         """
-        encoder.start_stream()
+        self.encoder.start_stream()
 
     def m1003(self):
         """
         Streaming off. Sends the command `stop_stream` to the virtual encoder.
         """
-        encoder.stop_stream()
+        self.encoder.stop_stream()
 
     def m1004(self, e: int):
         """
         Set exposure. Sets the camera's exposture to n microseconds.
         """
-        encoder.set_exposure(e)
+        self.encoder.set_exposure(e)

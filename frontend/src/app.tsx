@@ -13,7 +13,7 @@ import { PositionDisplay } from './position_diplay.tsx';
 
 export function App() {
   const [tab, setTab] = useState<number>(0);
-  const [encoder_ip, setEncoder_ip] = useState<string>('rpi5-00.local');
+  const [encoder_host, setEncoder_host] = useState<string>("virtual-encoder.local");
 
   const [nodes, setNodes] = useState<Array<TrajetoriaNode>>(JSON.parse(localStorage.getItem("nodes") || "[]"));
   const [nextId, setNextId] = useState<number>(Math.max(...nodes.map(n => n.id)) + 1);
@@ -76,6 +76,10 @@ export function App() {
       setStatus(prev => ({ ...prev, connected: true }))
     });
 
+    socket.on("encoder_host", (value: string) => {
+        setEncoder_host(value);
+    });
+
     return () => {
       socket.off("status");
       socket.off("connect");
@@ -85,7 +89,7 @@ export function App() {
 
 
   return (
-    <TrajetoriaContext.Provider value={{ is_dirty, setIsDirty, nodes, setNodes: setNodesStorage, getNextNodeId, encoder_ip, setEncoder_ip }}>
+    <TrajetoriaContext.Provider value={{ is_dirty, setIsDirty, nodes, setNodes: setNodesStorage, getNextNodeId, encoder_host, setEncoder_host }}>
       <div className="wrap">
         <div className={`toast-wrap${status.connected ? "" : " show"}`}>
           <div className="toast-connect">
@@ -111,8 +115,9 @@ export function App() {
           }
         </div>
         <SvgWrap status={status} offset={offset} bounds={bounds} />
+
+        <PositionDisplay pos={status.pos} />
       </div>
-      <PositionDisplay pos={status.pos} />
     </TrajetoriaContext.Provider>
   )
 }

@@ -92,6 +92,10 @@ class ActuatorApp(Flask):
         else:
             self.play()
 
+    def set_encoder_host(self, ws, host):
+        self.machine.encoder.host = host
+        ws.emit("encoder_host", host)
+
     def get_status(self):
         return {
             "running": self.is_running(),

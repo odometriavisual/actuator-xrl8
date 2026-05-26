@@ -4,11 +4,15 @@ import { socket } from "./socket";
 import './settings.css'
 
 export function Settings() {
-  const { nodes, setNodes } = useTrajetoria();
+  const { nodes, setNodes, encoder_host } = useTrajetoria();
 
   function shutdown_request() {
     socket.emit('shutdown');
     alert("Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.")
+  }
+
+  function set_encoder_host(host: string) {
+    socket.emit("set_encoder_host", host);
   }
 
   return (
@@ -20,6 +24,10 @@ export function Settings() {
           <textarea onInput={ev => setNodes(JSON.parse((ev.target as any).value))}> {JSON.stringify(nodes)}</textarea>
         </label>
 
+        <label>
+          <span>IP do encoder: </span>
+          <input type="text" onInput={ev => set_encoder_host((ev.target as any).value)} value={encoder_host} />
+        </label>
       </div>
       <button onClick={shutdown_request}> Shutdown </button>
     </>

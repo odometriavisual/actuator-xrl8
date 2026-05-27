@@ -1,9 +1,8 @@
 from flask import send_from_directory
 from flask_socketio import SocketIO
-import numpy as np
 
 from threading import Thread
-from time import sleep, time_ns
+from time import sleep
 
 try:
     from actuator_xrl8.button import start_button_thread
@@ -19,10 +18,15 @@ from actuator_xrl8.actuator_app import ActuatorApp
 def main():
     app = ActuatorApp()
     ws = SocketIO(app, cors_allowed_origins="*")
+    app.ws = ws
 
     @app.route("/")
     def index():
         return send_from_directory("../frontend/dist", "index.html")
+
+    @app.route("/dl/<file>")
+    def img(file):
+        return send_from_directory("/tmp", file)
 
     @ws.on("connect")
     def connect():
@@ -52,7 +56,7 @@ def main():
 
     @ws.on("set_encoder_host")
     def set_encoder_host(host):
-        app.set_encoder_host(ws, host)
+        app.set_encoder_host(host)
 
     def send_status():
         last_status = app.get_status()
@@ -62,13 +66,6 @@ def main():
             status = app.get_status()
 
             if last_status != status:
-                if not last_status["running"] and status["running"]:
-                    data = []
-                elif status["running"]:
-                    data.append([time_ns(), *status["pos"]])
-                elif last_status["running"] and not status["running"]:
-                    np.savez("/tmp/trajectory.npz", data)
-
                 ws.emit("status", status)
                 last_status = status
 

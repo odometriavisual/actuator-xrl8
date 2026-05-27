@@ -1,5 +1,8 @@
 from flask import Flask
+import matplotlib.pyplot as plt
+import numpy as np
 from threading import Thread, Event
+from time import time_ns
 
 try:
     from actuator_xrl8.motor import MotorGcodeMachine as GcodeMachine
@@ -17,15 +20,48 @@ class ActuatorApp(Flask):
             static_folder="../frontend/dist/assets",
         )
 
+        self.ws = None
+
         self.machine = GcodeMachine()
         self.interpreter = None
         self.running = False
         self.last_gcode = None
         self.pause_request = False
 
+        self.trajectory_timestamps = []
+        self.trajectory_x = []
+        self.trajectory_y = []
+        self.trajectory_figure = plt.figure()
+
         self.play_event = Event()
         self.play_event.clear()
         Thread(target=self.__run, daemon=True).start()
+
+    def __start_recording_trajectory(self):
+        self.trajectory_timestamps = []
+        self.trajectory_x = []
+        self.trajectory_y = []
+        self.trajectory_figure.clear()
+
+    def __append_to_trajectory(self, ts, x, y):
+        self.trajectory_timestamps.append(ts)
+        self.trajectory_x.append(x)
+        self.trajectory_y.append(y)
+
+    def __stop_recording_trajectory(self):
+        np.savez(
+            "/tmp/trajectory.npz",
+            timestamp=self.trajectory_timestamps,
+            x=self.trajectory_x,
+            y=self.trajectory_y
+        )
+
+        ax = self.trajectory_figure.add_subplot()
+        ax.axis("off")
+        ax.invert_yaxis()
+        ax.plot(self.trajectory_x, self.trajectory_y)
+        self.trajectory_figure.savefig("/tmp/trajectory.jpg")
+        self.ws.emit("new_trajectory_plot")
 
     def __run(self):
         while True:
@@ -33,6 +69,7 @@ class ActuatorApp(Flask):
             self.play_event.clear()
 
             if self.interpreter is not None:
+                self.__start_recording_trajectory()
                 self.running = True
                 self.pause_request = False
 
@@ -46,6 +83,7 @@ class ActuatorApp(Flask):
                 if self.interpreter.is_finished():
                     self.interpreter = None
 
+                self.__stop_recording_trajectory()
                 self.running = False
 
     def is_running(self):
@@ -92,14 +130,17 @@ class ActuatorApp(Flask):
         else:
             self.play()
 
-    def set_encoder_host(self, ws, host):
+    def set_encoder_host(self, host):
         self.machine.encoder.host = host
-        ws.emit("encoder_host", host)
+        self.ws.emit("encoder_host", host)
 
     def get_status(self):
+        pos = self.machine.get_position()
+        self.__append_to_trajectory(time_ns(), *pos)
+
         return {
             "running": self.is_running(),
             "gcode_loaded": self.is_trajectory_initialized(),
-            "pos": self.machine.get_position(),
+            "pos": pos,
             "calibrated": self.is_calibrated(),
         }

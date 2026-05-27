@@ -32,17 +32,16 @@ export function Settings({trajectoryImgSrc}: SettingsArgsType) {
           <span>IP do encoder: </span>
           <input type="text" onInput={ev => set_encoder_host((ev.target as any).value)} value={encoder_host} />
         </label>
-      </div>
 
-      {trajectoryImgSrc !== undefined?
-        <>
-          <a href="/dl/trajectory.npz">Baixar trajetória</a>
-          <img src={trajectoryImgSrc} />
-        </>
-        :
-        null
-      }
-    
+        {trajectoryImgSrc !== undefined?
+          <div className={"last-trajectory"}>
+            <a href="/dl/trajectory.npz">Baixar última trajetória realizada</a>
+            <img src={trajectoryImgSrc} />
+          </div>
+          :
+          null
+        }
+      </div>
       <button onClick={shutdown_request}> Shutdown </button>
     </>
   );

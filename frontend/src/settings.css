@@ -4,19 +4,36 @@
 
   display: flex;
   flex-direction: column;
-  align-items: space-around;
-  gap: 8px;
-}
+  align-items: space-evenly;
+  gap: 2em;
 
-.settings label {
-  width: 100%;
-  justify-content: begin;
+  label {
+    width: 100%;
+    justify-content: begin;
 
-  display: flex;
-  gap: 8px;
-}
+    display: flex;
+    gap: 1em;
+  }
 
-.settings input,
-.settings textarea {
-  flex-grow: 1;
+  input,
+  textarea {
+    flex-grow: 1;
+  }
+
+  .last-trajectory {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+
+    img {
+      width: 50%;
+    }
+
+    a {
+      color: var(--primary-color)
+    }
+  }
 }

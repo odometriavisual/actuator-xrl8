@@ -3,7 +3,11 @@ import { socket } from "./socket";
 
 import './settings.css'
 
-export function Settings() {
+export type SettingsArgsType = {
+  trajectoryImgSrc: string|undefined,
+};
+
+export function Settings({trajectoryImgSrc}: SettingsArgsType) {
   const { nodes, setNodes, encoder_host } = useTrajetoria();
 
   function shutdown_request() {
@@ -29,6 +33,16 @@ export function Settings() {
           <input type="text" onInput={ev => set_encoder_host((ev.target as any).value)} value={encoder_host} />
         </label>
       </div>
+
+      {trajectoryImgSrc !== undefined?
+        <>
+          <a href="/dl/trajectory.npz">Baixar trajetória</a>
+          <img src={trajectoryImgSrc} />
+        </>
+        :
+        null
+      }
+    
       <button onClick={shutdown_request}> Shutdown </button>
     </>
   );

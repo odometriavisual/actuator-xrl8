@@ -23,6 +23,8 @@ export function App() {
   const [stepSize, setStepSize] = useState<number>(1);
   const [target, setTarget] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
+  const [trajectoryImgSrc, setTrajectorImgSrc] = useState<string|undefined>(undefined);
+
   const setStepSizeRound: Dispatch<StateUpdater<number>> = s => {
     const next_s = s instanceof Function ? s(stepSize) : s;
     setStepSize(Math.round(next_s * 5) / 5);
@@ -80,6 +82,8 @@ export function App() {
         setEncoder_host(value);
     });
 
+    socket.on("new_trajectory_plot", () => setTrajectorImgSrc("/dl/trajectory.jpg?t=" + new Date().getTime()));
+
     return () => {
       socket.off("status");
       socket.off("connect");
@@ -110,7 +114,7 @@ export function App() {
               tab == 1 ?
                 <Manual status={status} stepSize={stepSize} setStepSize={setStepSizeRound} target={target} setTarget={setTargetRound} /> :
                 tab == 2 ?
-                  <Settings /> :
+                  <Settings trajectoryImgSrc={trajectoryImgSrc} /> :
                   null
           }
         </div>

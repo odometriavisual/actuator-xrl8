@@ -3,7 +3,7 @@ import re
 
 class Lexer:
     def __init__(self, gcode: str):
-        Lexer.pattern = r'([\w]\-?[\d\.]+|"[\w ]*")'
+        Lexer.pattern = r'([\w]\-?[\d\.]+|"[^"]*")'
         self._tokens = re.findall(Lexer.pattern, gcode.upper())
         self._i = 0
 

@@ -1,6 +1,7 @@
 from threading import Event, Thread
 from time import time_ns
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from flask import Flask
@@ -12,6 +13,7 @@ except RuntimeError:
 
 from actuator_xrl8.gcode_interpreter import GcodeInterpreter
 
+matplotlib.use('svg')
 
 class ActuatorApp(Flask):
     def __init__(self):

@@ -4,12 +4,13 @@ import { SvgWrap } from './svg_wrap.tsx';
 import { Trajetoria } from './trajetoria.tsx';
 import { Manual } from './manual.tsx';
 import { Settings } from './settings.tsx';
-
-import { socket } from './socket.tsx';
-import { type TrajetoriaNode, CommandType, type Status } from './types.tsx';
-import './app.css'
 import { TrajetoriaContext } from './trajetoria_context.tsx';
 import { PositionDisplay } from './position_diplay.tsx';
+import { type TrajetoriaNode, CommandType, type Status } from './types.tsx';
+
+import { socket } from './socket.tsx';
+
+import './app.css'
 
 export function App() {
   const [tab, setTab] = useState<number>(0);
@@ -24,6 +25,8 @@ export function App() {
   const [target, setTarget] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
   const [trajectoryImgSrc, setTrajectorImgSrc] = useState<string|undefined>(undefined);
+
+  const [toastData, setToastData] = useState<{text: string, show: boolean}>({text: "", show: false});
 
   const setStepSizeRound: Dispatch<StateUpdater<number>> = s => {
     const next_s = s instanceof Function ? s(stepSize) : s;
@@ -60,7 +63,7 @@ export function App() {
   };
 
   const [status, setStatus] = useState<Status>({
-    connected: true,
+    connected: undefined,
     running: false,
     gcode_loaded: false,
     pos: [0, 0],
@@ -69,6 +72,8 @@ export function App() {
 
   useEffect(() => {
     const t = setTimeout(() => setStatus(prev => ({ ...prev, connected: false })), 3000);
+    let toast_timeout: null | NodeJS.Timeout = null;
+    let is_first_encoder_host = true;
 
     socket.on("status", (value: Status) => setStatus(({ ...value, connected: true })));
     socket.on("disconnect", () => setStatus(prev => ({ ...prev, connected: false })));
@@ -80,6 +85,19 @@ export function App() {
 
     socket.on("encoder_host", (value: string) => {
         setEncoder_host(value);
+
+        if (!is_first_encoder_host) {
+          setToastData({text: `IP do encoder alterado para: "${value}"`, show: true});
+        
+          if (toast_timeout !== null) {
+            clearTimeout(toast_timeout);
+          }
+
+          toast_timeout = setTimeout(() => setToastData(t => {return {...t, show: false}}), 5000);
+        }
+        else {
+          is_first_encoder_host = false;
+        }
     });
 
     socket.on("new_trajectory_plot", () => setTrajectorImgSrc("/dl/trajectory.jpg?t=" + new Date().getTime()));
@@ -91,14 +109,21 @@ export function App() {
     };
   }, []);
 
+  console.log(status.connected)
 
   return (
     <TrajetoriaContext.Provider value={{ is_dirty, setIsDirty, nodes, setNodes: setNodesStorage, getNextNodeId, encoder_host, setEncoder_host }}>
       <div className="wrap">
-        <div className={`toast-wrap${status.connected ? "" : " show"}`}>
+        <div className={`toast-wrap toast-top ${status.connected === undefined || status.connected? "" : "show"}`}>
           <div className="toast-connect">
             <span>Erro ao conectar-se com o atuador, tentando novamente...</span>
             <div className="loader"></div>
+          </div>
+        </div>
+
+        <div className={`toast-wrap toast-bottom ${toastData.show? "show" : ""}`}>
+          <div className="toast-connect">
+            <span>{ toastData.text }</span>
           </div>
         </div>
 

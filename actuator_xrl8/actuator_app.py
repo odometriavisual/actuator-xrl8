@@ -139,6 +139,7 @@ class ActuatorApp(Flask):
     def set_encoder_host(self, host):
         self.machine.encoder.host = host
         self.ws.emit("encoder_host", host)
+        self.ws.emit("warn", f"IP do encoder alterado: {host}")
 
     def get_status(self):
         pos = self.machine.get_position()

@@ -1,8 +1,10 @@
-import RPi.GPIO as GPIO
-from time import sleep
 from threading import Thread
+from time import sleep
+
+from RPi import GPIO
 
 BUTTON = 14
+
 
 def __check_button(app):
     last_button_state = GPIO.HIGH

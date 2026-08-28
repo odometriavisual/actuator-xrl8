@@ -1,8 +1,9 @@
-from flask import Flask
+from threading import Event, Thread
+from time import time_ns
+
 import matplotlib.pyplot as plt
 import numpy as np
-from threading import Thread, Event
-from time import time_ns
+from flask import Flask
 
 try:
     from actuator_xrl8.motor import MotorGcodeMachine as GcodeMachine
@@ -10,6 +11,7 @@ except RuntimeError:
     from actuator_xrl8.gcode_machine import NullGcodeMachine as GcodeMachine
 
 from actuator_xrl8.gcode_interpreter import GcodeInterpreter
+
 
 class ActuatorApp(Flask):
     def __init__(self):
@@ -53,7 +55,7 @@ class ActuatorApp(Flask):
             "/tmp/trajectory.npz",
             timestamp=self.trajectory_timestamps,
             x=self.trajectory_x,
-            y=self.trajectory_y
+            y=self.trajectory_y,
         )
 
         ax = self.trajectory_figure.add_subplot()
@@ -108,9 +110,9 @@ class ActuatorApp(Flask):
 
     def step(self):
         self.running = True
-        if status := self.interpreter.step():
-            if status is not True:
-                print(f"{status}")
+
+        if (status := self.interpreter.step()) and status is not True:
+            print(f"{status}")
 
         if self.interpreter.is_finished():
             self.interpreter = None

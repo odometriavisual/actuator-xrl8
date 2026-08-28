@@ -1,8 +1,9 @@
-import RPi.GPIO as GPIO
-import time
-import multiprocessing
 import math
+import multiprocessing
+import time
+
 import numpy as np
+from RPi import GPIO
 
 from actuator_xrl8.gcode_machine import NullGcodeMachine
 
@@ -190,7 +191,7 @@ class MotorGcodeMachine(NullGcodeMachine):
 
         return all(
             self.move(speed_x[i], x_semi[i], speed_y[i], y_semi[i])
-            for i in range(0, len(x_semi))
+            for i in range(len(x_semi))
         )
 
     def g3(self, x, y, s, raio) -> bool:
@@ -263,7 +264,7 @@ class MotorGcodeMachine(NullGcodeMachine):
 
         return all(
             self.move(speed_x[i], x_semi[i], speed_y[i], y_semi[i])
-            for i in range(0, len(x_semi))
+            for i in range(len(x_semi))
         )
 
     def g28(self) -> bool:
@@ -336,19 +337,20 @@ class MotorGcodeMachine(NullGcodeMachine):
 
         try:
             self.__move(speed_x * 2, position_x, speed_y * 2, position_y)
-        except Exception as e:
-            print(f"Movement error: {e}")
-            raise
-        finally:
             GPIO.output(STEP_PIN_X, False)
             GPIO.output(STEP_PIN_Y, False)
+
+        except Exception as e:  # noqa: BLE001
+            print(f"Movement error: {e}")
+
+        finally:
             self.movement_done.set()
 
-            if self.pause_requested:
-                self.pause_requested = False
-                return False
+        if self.pause_requested:
+            self.pause_requested = False
+            return False
 
-            return True
+        return True
 
     def __move(self, speed_x, position_x, speed_y, position_y):
         # Validate positions

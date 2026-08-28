@@ -1,8 +1,8 @@
-from flask import send_from_directory
-from flask_socketio import SocketIO
-
 from threading import Thread
 from time import sleep
+
+from flask import send_from_directory
+from flask_socketio import SocketIO
 
 try:
     from actuator_xrl8.button import start_button_thread
@@ -52,6 +52,7 @@ def main():
     @ws.on("shutdown")
     def shutdown():
         import os
+
         os.system("sudo shutdown now -P")
 
     @ws.on("set_encoder_host")
@@ -60,7 +61,6 @@ def main():
 
     def send_status():
         last_status = app.get_status()
-        data = []
 
         while True:
             status = app.get_status()

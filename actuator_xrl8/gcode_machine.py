@@ -1,7 +1,7 @@
+from time import sleep
+
 import numpy as np
 from numpy.typing import NDArray
-
-from time import sleep
 
 from actuator_xrl8.virtual_encoder_api import EncoderApi
 

@@ -1,9 +1,10 @@
 import requests
 
+
 class EncoderApi:
     def __init__(self, host):
         self.host = host
-        
+
     def start_acquisition(self, pulses_per_second: int, reason: str):
         """
         If in the ModoOdometro or in the ModoTempo at the Ready state, starts an aquisition.
@@ -11,11 +12,13 @@ class EncoderApi:
         ModoOdometro ignores the parameter pulses_per_second.
         """
         try:
-            requests.post(f"http://{self.host}/start_acquisition/{pulses_per_second}/{reason}", timeout=3)
+            requests.post(
+                f"http://{self.host}/start_acquisition/{pulses_per_second}/{reason}",
+                timeout=3,
+            )
             return True
         except requests.RequestException:
             return False
-
 
     def stop_acquisition(self):
         """
@@ -27,7 +30,6 @@ class EncoderApi:
         except requests.RequestException:
             return False
 
-
     def start_stream(self):
         """
         Starts the video stream.
@@ -38,7 +40,6 @@ class EncoderApi:
         except requests.RequestException:
             return False
 
-
     def stop_stream(self):
         """
         Stops the video stream.
@@ -48,7 +49,6 @@ class EncoderApi:
             return True
         except requests.RequestException:
             return False
-
 
     def set_exposure(self, value: int):
         """

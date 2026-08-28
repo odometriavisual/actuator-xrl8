@@ -80,6 +80,7 @@ class ActuatorApp(Flask):
                 while status := self.interpreter.step():
                     if status is not True:
                         print(f"{status}")
+                        self.ws.emit("warn", status)
                         break
                     if self.pause_request:
                         break
@@ -115,6 +116,7 @@ class ActuatorApp(Flask):
 
         if (status := self.interpreter.step()) and status is not True:
             print(f"{status}")
+            self.ws.emit("warn", status)
 
         if self.interpreter.is_finished():
             self.interpreter = None

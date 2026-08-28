@@ -189,9 +189,11 @@ class GcodeInterpreter:
                 s = self._commands[0][2]
 
                 if all(i is not None for i in [f, s]):
-                    self._machine.m1000(f, s)
-                    self._commands.pop(0)
-                    return True
+                    if  self._machine.m1000(f, s):
+                        self._commands.pop(0)
+                    else:
+                        self._commands.clear()
+                        return "Erro de comunicação com o encoder"
                 else:
                     return "interpreter error: malformed M1000"
 
@@ -199,9 +201,11 @@ class GcodeInterpreter:
                 e = self._commands[0][1]
 
                 if e:
-                    self._machine.m1004(e)
-                    self._commands.pop(0)
-                    return True
+                    if self._machine.m1004(e):
+                        self._commands.pop(0)
+                    else:
+                        self._commands.clear()
+                        return "Erro de comunicação com o encoder"
                 else:
                     return "interpreter error: malformed M1004"
 
@@ -221,16 +225,25 @@ class GcodeInterpreter:
                 self._commands.pop(0)
 
             elif comm == "M1001":
-                self._machine.m1001()
-                self._commands.pop(0)
+                if self._machine.m1001():
+                    self._commands.pop(0)
+                else:
+                    self._commands.clear()
+                    return "Erro de comunicação com o encoder"
 
             elif comm == "M1002":
-                self._machine.m1002()
-                self._commands.pop(0)
+                if self._machine.m1002():
+                    self._commands.pop(0)
+                else:
+                    self._commands.clear()
+                    return "Erro de comunicação com o encoder"
 
             elif comm == "M1003":
-                self._machine.m1003()
-                self._commands.pop(0)
+                if self._machine.m1003():
+                    self._commands.pop(0)
+                else:
+                    self._commands.clear()
+                    return "Erro de comunicação com o encoder"
 
             else:
                 return f'interpreter error: invalid command {comm}"'

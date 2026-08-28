@@ -100,6 +100,17 @@ export function App() {
         }
     });
 
+    socket.on("warn", (value: string) => {
+        setToastData({text: value, show: true});
+
+        if (toast_timeout !== null) {
+          clearTimeout(toast_timeout);
+        }
+
+        toast_timeout = setTimeout(() => setToastData(t => {return {...t, show: false}}), 5000);
+      
+    })
+
     socket.on("new_trajectory_plot", () => setTrajectorImgSrc("/dl/trajectory.jpg?t=" + new Date().getTime()));
 
     return () => {
@@ -108,8 +119,6 @@ export function App() {
       socket.off("disconnect");
     };
   }, []);
-
-  console.log(status.connected)
 
   return (
     <TrajetoriaContext.Provider value={{ is_dirty, setIsDirty, nodes, setNodes: setNodesStorage, getNextNodeId, encoder_host, setEncoder_host }}>

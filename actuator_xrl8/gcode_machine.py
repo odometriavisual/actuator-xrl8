@@ -133,28 +133,28 @@ class NullGcodeMachine:
         """
         Start encoder. Sends the command `start_acquisition` to the virtual encoder.
         """
-        self.encoder.start_acquisition(pulses_per_second=f, reason=acquisition_name)
+        return self.encoder.start_acquisition(pulses_per_second=f, reason=acquisition_name)
 
     def m1001(self):
         """
         Stop encoder. Sends the command `stop_acquisition` to the virtual encoder.
         """
-        self.encoder.stop_acquisition()
+        return self.encoder.stop_acquisition()
 
     def m1002(self):
         """
         Streaming on. Sends the command `start_stream` to the virtual encoder.
         """
-        self.encoder.start_stream()
+        return self.encoder.start_stream()
 
     def m1003(self):
         """
         Streaming off. Sends the command `stop_stream` to the virtual encoder.
         """
-        self.encoder.stop_stream()
+        return self.encoder.stop_stream()
 
     def m1004(self, e: int):
         """
         Set exposure. Sets the camera's exposture to n microseconds.
         """
-        self.encoder.set_exposure(e)
+        return self.encoder.set_exposure(e)

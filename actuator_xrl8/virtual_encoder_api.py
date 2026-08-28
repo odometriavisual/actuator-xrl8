@@ -14,7 +14,7 @@ class EncoderApi:
         try:
             requests.post(
                 f"http://{self.host}/start_acquisition/{pulses_per_second}/{reason}",
-                timeout=3,
+                timeout=1,
             )
             return True
         except requests.RequestException:
@@ -25,7 +25,7 @@ class EncoderApi:
         If in the ModoOdometro or in the ModoTempo at the Aquisição state, stops and saves an aquisition.
         """
         try:
-            requests.post(f"http://{self.host}/stop_acquisition", timeout=3)
+            requests.post(f"http://{self.host}/stop_acquisition", timeout=1)
             return True
         except requests.RequestException:
             return False
@@ -35,7 +35,7 @@ class EncoderApi:
         Starts the video stream.
         """
         try:
-            requests.post(f"http://{self.host}/start_stream", timeout=3)
+            requests.post(f"http://{self.host}/start_stream", timeout=1)
             return True
         except requests.RequestException:
             return False
@@ -45,7 +45,7 @@ class EncoderApi:
         Stops the video stream.
         """
         try:
-            requests.post(f"http://{self.host}/stop_stream", timeout=3)
+            requests.post(f"http://{self.host}/stop_stream", timeout=1)
             return True
         except requests.RequestException:
             return False
@@ -55,7 +55,7 @@ class EncoderApi:
         Sets the camera exposure. Value must be an integer in microseconds.
         """
         try:
-            requests.post(f"http://{self.host}/set_exposure/{value}", timeout=3)
+            requests.post(f"http://{self.host}/set_exposure/{value}", timeout=1)
             return True
         except requests.RequestException:
             return False

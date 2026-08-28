@@ -13,6 +13,20 @@
   box-sizing: border-box;
 }
 
+.grabbable {
+  &.block {
+    cursor: not-allowed;
+  }
+
+  &.grab {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
 .svg-wrap svg {
   max-height: 100%;
   border: 1px solid var(--background-color);

@@ -64,6 +64,8 @@ export function SvgWrap({ status, offset, bounds }: SvgWrapArgs) {
   }
 
   const onDoubleClick = (e: MouseEvent) => {
+    if (status.running) return;
+
     const pt = getSvgPoint(e);
     const move_nodes = nodes.filter(n => CommandType.is_movement(n.command.type));
     const last = move_nodes[move_nodes.length - 1] || { s: 50 };
@@ -124,7 +126,7 @@ export function SvgWrap({ status, offset, bounds }: SvgWrapArgs) {
   const move_nodes = nodes.map((n: any, i: number) => [n, i]).filter(a => CommandType.is_movement(a[0].command.type));
 
   return (
-    <div className="svg-wrap">
+    <div className={"svg-wrap grabbable " + (status.running ? "block" : "")}>
       <svg viewBox={`${bounds.x0} ${bounds.y0} ${bounds.width} ${bounds.height}`} onDblClick={onDoubleClick} onPointerMove={onPointerMove} onPointerUp={onPointerUp}>
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5.5" refY="2.5" orient="auto" markerUnits="strokeWidth">
@@ -155,7 +157,7 @@ export function SvgWrap({ status, offset, bounds }: SvgWrapArgs) {
               <circle cx={n[0].command.x + offset.x} cy={n[0].command.y + offset.y} r={4.5}
                 fill="var(--on-surface-color)"
                 filter="url(#shadow)"
-                style={status.running ? "cursor: not-allowed" : "cursor: grab"} />
+                className={"grabbable " + (status.running ? "block" : "grab")} />
             </g>
           ))}
         </g>

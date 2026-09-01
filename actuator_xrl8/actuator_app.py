@@ -62,6 +62,7 @@ class ActuatorApp(Flask):
 
         ax = self.trajectory_figure.add_subplot()
         ax.axis("off")
+        ax.set_aspect("equal")
         ax.invert_yaxis()
         ax.plot(self.trajectory_x, self.trajectory_y)
         self.trajectory_figure.savefig("/tmp/trajectory.jpg")

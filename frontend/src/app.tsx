@@ -24,7 +24,7 @@ export function App() {
   const [stepSize, setStepSize] = useState<number>(1);
   const [target, setTarget] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
 
-  const [trajectoryImgSrc, setTrajectorImgSrc] = useState<string | undefined>(undefined);
+  const [lastTrajectory, setLastTrajectory] = useState<string | undefined>(undefined);
 
   const [toastData, setToastData] = useState<{ text: string, show: boolean }>({ text: "", show: false });
 
@@ -94,7 +94,7 @@ export function App() {
       toast_timeout = setTimeout(() => setToastData(t => { return { ...t, show: false } }), 5000);
     })
 
-    socket.on("new_trajectory_plot", () => setTrajectorImgSrc("/dl/trajectory.jpg?t=" + new Date().getTime()));
+    socket.on("new_trajectory_plot", timestamp => setLastTrajectory(timestamp));
 
     return () => {
       socket.off("status");
@@ -131,7 +131,7 @@ export function App() {
               tab == 1 ?
                 <Manual status={status} stepSize={stepSize} setStepSize={setStepSizeRound} target={target} setTarget={setTargetRound} /> :
                 tab == 2 ?
-                  <Settings trajectoryImgSrc={trajectoryImgSrc} /> :
+                  <Settings lastTrajectory={lastTrajectory} /> :
                   null
           }
         </div>

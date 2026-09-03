@@ -4,10 +4,10 @@ import { socket } from "./socket";
 import './settings.css'
 
 export type SettingsArgsType = {
-  trajectoryImgSrc: string|undefined,
+  lastTrajectory: string|undefined,
 };
 
-export function Settings({trajectoryImgSrc}: SettingsArgsType) {
+export function Settings({lastTrajectory}: SettingsArgsType) {
   const { nodes, setNodes, encoder_host } = useTrajetoria();
 
   function shutdown_request() {
@@ -33,10 +33,10 @@ export function Settings({trajectoryImgSrc}: SettingsArgsType) {
           <input type="text" onInput={ev => set_encoder_host((ev.target as any).value)} value={encoder_host} />
         </label>
 
-        {trajectoryImgSrc !== undefined?
+        {lastTrajectory !== undefined?
           <div className={"last-trajectory"}>
-            <a href="/dl/trajectory.npz">Baixar última trajetória realizada</a>
-            <img src={trajectoryImgSrc} />
+            <a href={`/dl/${lastTrajectory}.npz`}>Baixar última trajetória realizada</a>
+            <img src={lastTrajectory + ".jpg"} />
           </div>
           :
           null

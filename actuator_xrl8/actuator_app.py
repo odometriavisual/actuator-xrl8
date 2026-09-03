@@ -1,3 +1,5 @@
+from datetime import datetime
+from pathlib import Path
 from threading import Event, Thread
 from time import time_ns
 
@@ -13,7 +15,8 @@ except RuntimeError:
 
 from actuator_xrl8.gcode_interpreter import GcodeInterpreter
 
-matplotlib.use('svg')
+matplotlib.use("svg")
+
 
 class ActuatorApp(Flask):
     def __init__(self):
@@ -53,8 +56,10 @@ class ActuatorApp(Flask):
         self.trajectory_y.append(y)
 
     def __stop_recording_trajectory(self):
+        timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")  # noqa: DTZ005
+
         np.savez(
-            "/tmp/trajectory.npz",
+            f"/tmp/{timestamp}.npz",
             timestamp=self.trajectory_timestamps,
             x=self.trajectory_x,
             y=self.trajectory_y,
@@ -65,8 +70,12 @@ class ActuatorApp(Flask):
         ax.set_aspect("equal")
         ax.invert_yaxis()
         ax.plot(self.trajectory_x, self.trajectory_y)
-        self.trajectory_figure.savefig("/tmp/trajectory.jpg")
-        self.ws.emit("new_trajectory_plot")
+
+        if not Path("/tmp/dl/").is_dir():
+            Path("/tmp/dl").mkdir()
+
+        self.trajectory_figure.savefig(f"/tmp/dl/{timestamp}.jpg")
+        self.ws.emit("new_trajectory_plot", timestamp)
 
     def __run(self):
         while True:

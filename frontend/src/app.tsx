@@ -9,6 +9,7 @@ import { PositionDisplay } from './position_diplay.tsx';
 import { type TrajetoriaNode, CommandType, type Status } from './types.tsx';
 
 import { socket } from './socket.tsx';
+import { useToast } from './toast.tsx';
 
 import './app.css'
 
@@ -26,7 +27,7 @@ export function App() {
 
   const [lastTrajectory, setLastTrajectory] = useState<string | undefined>(undefined);
 
-  const [toastData, setToastData] = useState<{ text: string, show: boolean }>({ text: "", show: false });
+  const {toastShow, toastText, sendToast} = useToast();
 
   const setStepSizeRound: Dispatch<StateUpdater<number>> = s => {
     const next_s = s instanceof Function ? s(stepSize) : s;
@@ -71,8 +72,8 @@ export function App() {
   });
 
   function shutdown_request() {
-    socket.emit('shutdown');
-    setToastData({ text: "Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.", show: true})
+    socket.emit("shutdown");
+    sendToast("Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.", 10000);
   }
 
   useEffect(() => {
@@ -88,16 +89,7 @@ export function App() {
 
     socket.on("encoder_host", (value: string) => setEncoder_host(value));
 
-    let toast_timeout: null | NodeJS.Timeout = null;
-    socket.on("warn", (value: string) => {
-      setToastData({ text: value, show: true });
-
-      if (toast_timeout !== null) {
-        clearTimeout(toast_timeout);
-      }
-
-      toast_timeout = setTimeout(() => setToastData(t => { return { ...t, show: false } }), 5000);
-    })
+    socket.on("warn", (value: string) => sendToast(value, 5000));
 
     socket.on("new_trajectory_plot", timestamp => setLastTrajectory(timestamp));
 
@@ -113,14 +105,14 @@ export function App() {
       <div className="wrap">
         <div className={`toast-wrap toast-top ${status.connected === undefined || status.connected ? "" : "show"}`}>
           <div className="toast-connect">
-            <span>Erro ao conectar-se com o atuador, tentando novamente...</span>
+            <span>Sem conexão com o atuador, tentanto se conectar novamente...</span>
             <div className="loader"></div>
           </div>
         </div>
 
-        <div className={`toast-wrap toast-bottom ${toastData.show ? "show" : ""}`}>
+        <div className={`toast-wrap toast-bottom ${toastShow ? "show" : ""}`}>
           <div className="toast-connect">
-            <span>{toastData.text}</span>
+            <span>{toastText}</span>
           </div>
         </div>
 

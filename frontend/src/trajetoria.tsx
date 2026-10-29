@@ -6,6 +6,7 @@ import { CommandType, find_last_movement_node_before, type Bounds, type Status, 
 import './trajetoria.css'
 import { useTrajetoria } from './trajetoria_context.tsx'
 import { nodes_to_gcode } from './gcode.tsx'
+import { useToast } from './toast.tsx'
 
 type TrajetoriaArgs = {
   status: Status,
@@ -109,6 +110,7 @@ function CommandArgs({ n, i, nodes, update_node }: { n: TrajetoriaNode, i: numbe
 
 export function Trajetoria({ status, offset, setOffset, bounds }: TrajetoriaArgs) {
   const rowDragIndex = useRef<number | null>(null);
+  const { sendToast } = useToast();
   const { is_dirty, setIsDirty, nodes, setNodes, getNextNodeId } = useTrajetoria();
 
   function add_node(e: Event) {
@@ -170,6 +172,11 @@ export function Trajetoria({ status, offset, setOffset, bounds }: TrajetoriaArgs
   function home() {
     socket.emit("gcode", "G28")
     setIsDirty(true);
+  }
+
+  function shutdown_request() {
+    socket.emit("shutdown");
+    sendToast("Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.", 10000);
   }
 
   function toggle_play_pause() {
@@ -305,6 +312,7 @@ export function Trajetoria({ status, offset, setOffset, bounds }: TrajetoriaArgs
               <i class="bi bi-house-fill"></i> Calibrar Home
             </span>
           </button>
+          <button onClick={() => confirm("Confirmar desligamento?") && shutdown_request() }> <i className="power bi bi-power"></i> </button>
         </div>
       </div>
     </>

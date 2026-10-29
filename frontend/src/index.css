@@ -29,6 +29,7 @@
   --on-surface-alt-color: #cccccc;
 
   --warning-color: #ff3322;
+  --warning-alt-color: hsl(0 69% 49%);
 }
 
 body {

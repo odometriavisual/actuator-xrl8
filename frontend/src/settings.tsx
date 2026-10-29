@@ -10,11 +10,6 @@ export type SettingsArgsType = {
 export function Settings({lastTrajectory}: SettingsArgsType) {
   const { nodes, setNodes, encoder_host } = useTrajetoria();
 
-  function shutdown_request() {
-    socket.emit('shutdown');
-    alert("Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.")
-  }
-
   function set_encoder_host(host: string) {
     socket.emit("set_encoder_host", host);
   }
@@ -42,7 +37,6 @@ export function Settings({lastTrajectory}: SettingsArgsType) {
           null
         }
       </div>
-      <button onClick={shutdown_request}> Shutdown </button>
     </>
   );
 }

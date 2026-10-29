@@ -70,6 +70,11 @@ export function App() {
     calibrated: false
   });
 
+  function shutdown_request() {
+    socket.emit('shutdown');
+    alert("Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.")
+  }
+
   useEffect(() => {
     const t = setTimeout(() => setStatus(prev => ({ ...prev, connected: false })), 3000);
 
@@ -124,6 +129,7 @@ export function App() {
             <button className={tab == 0 ? "selected" : ""} onClick={() => setTab(0)}> Trajetória </button>
             <button className={tab == 1 ? "selected" : ""} onClick={() => setTab(1)}> Controle Manual </button>
             <button className={tab == 2 ? "selected" : ""} onClick={() => setTab(2)}> <i className={tab == 2 ? "bi bi-gear" : "bi bi-gear-fill"}></i> </button>
+            <button onClick={() => confirm("Confirmar desligamento?") && shutdown_request() }> <i className="power bi bi-power"></i> </button>
           </div>
           {
             tab == 0 ?

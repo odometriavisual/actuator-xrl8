@@ -24,6 +24,7 @@ export type CommandData = {
 };
 
 export type TrajetoriaNode = { id: number; command: CommandData; };
+
 export type Status = {
   connected: boolean|undefined;
   running: boolean;

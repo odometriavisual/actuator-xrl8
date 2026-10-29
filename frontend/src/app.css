@@ -26,32 +26,41 @@
   background-color: var(--surface-color);
   color: black;
   border-radius: 10px;
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    button {
+      flex-grow: 2;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      background-color: var(--primary-alt-color);
+      color: var(--on-primary-alt-color);
+      user-select: none;
+
+      &.selected {
+        background-color: var(--primary-color);
+        color: var(--on-primary-color);
+      }
+
+      &:hover {
+        &:has(.power) {
+          background-color: var(--warning-color);
+          color: var(--on-primary-color);
+        }
+      }
+
+      &:last-child,
+      &:nth-last-child(2) {
+        flex-grow: 1;
+      }
+    }
+  }
+
   padding: 12px;
-}
-
-.panel .tabs {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.panel .tabs button {
-  flex-grow: 2;
-  border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-  background-color: var(--primary-alt-color);
-  color: var(--on-primary-alt-color);
-  user-select: none;
-}
-
-.panel .tabs button:last-child {
-  flex-grow: 1;
-}
-
-.panel .tabs button.selected {
-  background-color: var(--primary-color);
-  color: var(--on-primary-color);
 }
 
 .toast-wrap {

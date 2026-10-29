@@ -72,7 +72,7 @@ export function App() {
 
   function shutdown_request() {
     socket.emit('shutdown');
-    alert("Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.")
+    setToastData({ text: "Desligando o atuador... Aguarde 1min antes de desligar a fonte de energia.", show: true})
   }
 
   useEffect(() => {

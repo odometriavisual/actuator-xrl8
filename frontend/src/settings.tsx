@@ -50,7 +50,7 @@ export function Settings({lastTrajectory}: SettingsArgsType) {
 
           <label>
             Carregar trajetória <i className="bi bi-upload" />
-            <input type="file" accept=".json" onChange={ev => upload_trajectory(ev.target.files[0])} />
+            <input type="file" accept=".json" onChange={ev => upload_trajectory((ev?.target as any)?.files[0])} />
           </label>
         </section>
 

@@ -28,6 +28,7 @@ class ActuatorApp(Flask):
         )
 
         self.ws = None
+        self.last_trajectory_ts = None
 
         self.machine = GcodeMachine()
         self.interpreter = None
@@ -38,7 +39,7 @@ class ActuatorApp(Flask):
         self.trajectory_timestamps = []
         self.trajectory_x = []
         self.trajectory_y = []
-        self.trajectory_figure = plt.figure()
+        self.trajectory_figure = plt.figure(figsize=(5, 5))
 
         self.play_event = Event()
         self.play_event.clear()
@@ -66,7 +67,8 @@ class ActuatorApp(Flask):
         )
 
         ax = self.trajectory_figure.add_subplot()
-        ax.axis("off")
+        ax.axis("equal")
+        ax.grid(True)
         ax.set_aspect("equal")
         ax.invert_yaxis()
         ax.plot(self.trajectory_x, self.trajectory_y)
@@ -76,6 +78,7 @@ class ActuatorApp(Flask):
 
         self.trajectory_figure.savefig(f"/tmp/dl/{timestamp}.jpg")
         self.ws.emit("new_trajectory_plot", timestamp)
+        self.last_trajectory_ts = timestamp
 
     def __run(self):
         while True:

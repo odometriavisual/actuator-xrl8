@@ -32,6 +32,7 @@ def main():
     def connect():
         ws.emit("status", app.get_status())
         ws.emit("encoder_host", app.machine.encoder.host)
+        ws.emit("new_trajectory_plot", app.last_trajectory_ts)
 
     @ws.on("gcode")
     def gcode(gcode_src):
@@ -69,7 +70,7 @@ def main():
                 ws.emit("status", status)
                 last_status = status
 
-            sleep(1 / 30)
+            sleep(1 / 100)
 
     Thread(target=send_status, daemon=True).start()
     start_button_thread(app)

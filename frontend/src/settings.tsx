@@ -64,8 +64,8 @@ export function Settings({lastTrajectory}: SettingsArgsType) {
 
           {lastTrajectory !== undefined?
             <div className={"last-trajectory"}>
-              <a href={`/dl/${lastTrajectory}.npz`}>Baixar última trajetória realizada</a>
-              <img src={lastTrajectory + ".jpg"} />
+              <a href={`/dl/${lastTrajectory}.npz`}>Baixar gravação da última trajetória realizada</a>
+              <img src={`/dl/${lastTrajectory}.jpg`} />
             </div>
             :
             null

@@ -99,14 +99,14 @@ export function App() {
     <TrajetoriaContext.Provider value={{ is_dirty, setIsDirty, nodes, setNodes: setNodesStorage, getNextNodeId, encoder_host, setEncoder_host }}>
       <div className="wrap">
         <div className={`toast-wrap toast-top ${status.connected === undefined || status.connected ? "" : "show"}`}>
-          <div className="toast-connect">
+          <div className="toast-content">
             <span>Sem conexão com o atuador, tentanto se conectar novamente...</span>
             <div className="loader"></div>
           </div>
         </div>
 
         <div className={`toast-wrap toast-bottom ${toastShow ? "show" : ""}`}>
-          <div className="toast-connect">
+          <div className={"toast-content toast-warn"}>
             <span>{toastText}</span>
           </div>
         </div>

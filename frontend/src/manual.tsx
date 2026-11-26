@@ -1,5 +1,5 @@
 import "bootstrap-icons/font/bootstrap-icons.css"
-import type { Dispatch, StateUpdater } from "preact/hooks";
+import { useState, type Dispatch, type StateUpdater } from "preact/hooks";
 
 import { socket } from './socket';
 import type { Status } from './types.tsx';
@@ -14,6 +14,8 @@ type ManualParams = {
 };
 
 export function Manual({ status, stepSize, setStepSize, target, setTarget }: ManualParams) {
+  const [speed, setSpeed] = useState(10);
+  
   function setTargetX(value: number) {
     setTarget(prev => { return { x: value, y: prev.y }; });
   };
@@ -28,7 +30,7 @@ export function Manual({ status, stepSize, setStepSize, target, setTarget }: Man
   }
 
   function goto() {
-    socket.emit("gcode", `G0 X${target.x} Y${target.y}`)
+    socket.emit("gcode", `G1 X${target.x} Y${target.y} S${speed}`)
   }
 
   function home() {
@@ -38,30 +40,30 @@ export function Manual({ status, stepSize, setStepSize, target, setTarget }: Man
   function left() {
     const x = status.pos[0] - stepSize;
     const y = status.pos[1];
-    socket.emit("gcode", `G0 X${x} Y${y}`)
+    socket.emit("gcode", `G1 X${x} Y${y} S${speed}`)
   }
 
   function right() {
     const x = status.pos[0] + stepSize;
     const y = status.pos[1];
-    socket.emit("gcode", `G0 X${x} Y${y}`)
+    socket.emit("gcode", `G1 X${x} Y${y} S${speed}`)
   }
 
   function up() {
     const x = status.pos[0];
     const y = status.pos[1] - stepSize;
-    socket.emit("gcode", `G0 X${x} Y${y}`)
+    socket.emit("gcode", `G1 X${x} Y${y} ${speed}`)
   }
 
   function down() {
     const x = status.pos[0];
     const y = status.pos[1] + stepSize;
-    socket.emit("gcode", `G0 X${x} Y${y}`)
+    socket.emit("gcode", `G1 X${x} Y${y} S${speed}`)
   }
 
   return (
     <>
-      <div className="manual-wrap">
+      <div className="manual-controls">
         <button disabled={!status.connected || !status.calibrated || status.running} onClick={up}>
           <i class="bi bi-arrow-up"></i>
         </button>
@@ -78,15 +80,22 @@ export function Manual({ status, stepSize, setStepSize, target, setTarget }: Man
           <i class="bi bi-arrow-down"></i>
         </button>
       </div>
-      <label className="manual-multiplier">
-        <span>Tamanho do passo (mm):</span>
-        <input type="number" step="0.2" value={stepSize} onChange={(e: any) => setStepSizeRound(parseFloat(e.target.value))} />
-      </label>
-      <label className="manual-goto">
-        <input type="number" step="0.2" placeholder="x" value={target.x} onChange={(e: any) => setTargetX(parseFloat(e.target.value))}></input>
-        <input type="number" step="0.2" placeholder="y" value={target.y} onSubmit={console.log} onChange={(e: any) => setTargetY(parseFloat(e.target.value))}></input>
-        <button onClick={() => goto()}>Go to</button>
-      </label>
+
+      <div className="manual-settings">
+        <label className="manual-multiplier">
+          <span>Tamanho do passo (mm):</span>
+          <input type="number" step="0.2" value={stepSize} onChange={(e: any) => setStepSizeRound(parseFloat(e.target.value))} />
+        </label>
+        <label className="manual-speed">
+          <span>Velocidade (mm/ss):</span>
+          <input type="number" step="0.2" value={speed} onChange={(e: any) => setSpeed(parseFloat(e.target.value))} />
+        </label>
+        <label className="manual-goto">
+          <input type="number" step="0.2" placeholder="x" value={target.x} onChange={(e: any) => setTargetX(parseFloat(e.target.value))}></input>
+          <input type="number" step="0.2" placeholder="y" value={target.y} onSubmit={console.log} onChange={(e: any) => setTargetY(parseFloat(e.target.value))}></input>
+          <button onClick={() => goto()}>Go to</button>
+        </label>
+      </div>
     </>
   );
 }

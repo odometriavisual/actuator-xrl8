@@ -164,6 +164,11 @@ export function Trajetoria({ status, offset, setOffset, bounds }: TrajetoriaArgs
   }
 
   function send_trajetoria() {
+    if (nodes.length < 2) {
+      sendToast("A trajetória não possui pontos o suficiente!", 5000);
+      return;
+    }
+
     const gcode = nodes_to_gcode(nodes, offset);
     socket.emit("gcode", gcode)
     setIsDirty(false);

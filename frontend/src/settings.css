@@ -63,13 +63,10 @@
 
       border: 2px solid var(--primary-color);
       border-radius: 12px;
+      color: var(--primary-color);
 
       img {
         width: 50%;
-      }
-
-      a {
-        color: var(--primary-color)
       }
     }
   }

@@ -27,6 +27,10 @@ class ActuatorApp(Flask):
             static_folder="../frontend/dist/assets",
         )
 
+        self.dl_dir = Path("/home/pi/trajetoria_dl")
+        if not self.dl_dir.is_dir():
+            self.dl_dir.mkdir()
+
         self.ws = None
         self.last_trajectory_ts = None
 
@@ -60,7 +64,7 @@ class ActuatorApp(Flask):
         timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")  # noqa: DTZ005
 
         np.savez(
-            f"/tmp/{timestamp}.npz",
+            self.dl_dir / f"gravacao-{timestamp}.npz",
             timestamp=self.trajectory_timestamps,
             x=self.trajectory_x,
             y=self.trajectory_y,
@@ -71,12 +75,11 @@ class ActuatorApp(Flask):
         ax.grid(True)
         ax.set_aspect("equal")
         ax.invert_yaxis()
-        ax.plot(self.trajectory_x, self.trajectory_y)
 
-        if not Path("/tmp/dl/").is_dir():
-            Path("/tmp/dl").mkdir()
+        min_len = min(len(self.trajectory_x), len(self.trajectory_y))
+        ax.plot(self.trajectory_x[:min_len], self.trajectory_y[:min_len])
 
-        self.trajectory_figure.savefig(f"/tmp/dl/{timestamp}.jpg")
+        self.trajectory_figure.savefig(self.dl_dir / f"gravacao-{timestamp}.jpg")
         self.ws.emit("new_trajectory_plot", timestamp)
         self.last_trajectory_ts = timestamp
 

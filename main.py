@@ -26,7 +26,7 @@ def main():
 
     @app.route("/dl/<file>")
     def img(file):
-        return send_from_directory("/tmp/dl", file)
+        return send_from_directory(app.dl_dir, file)
 
     @ws.on("connect")
     def connect():

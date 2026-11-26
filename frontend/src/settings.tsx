@@ -20,7 +20,7 @@ export function Settings({lastTrajectory}: SettingsArgsType) {
     const blob = new Blob([data], { type: "application/json" });
     const jsonObjectUrl = URL.createObjectURL(blob);
 
-    const filename = `trajectoria de ${(new Date()).toISOString()}.json`;
+    const filename = `comandos de ${(new Date()).toISOString()}.json`;
 
     const anchorEl = document.createElement("a");
     anchorEl.href = jsonObjectUrl;
@@ -63,10 +63,10 @@ export function Settings({lastTrajectory}: SettingsArgsType) {
           </label>
 
           {lastTrajectory !== undefined?
-            <div className={"last-trajectory"}>
-              <a href={`/dl/${lastTrajectory}.npz`}>Baixar gravação da última trajetória realizada</a>
-              <img src={`/dl/${lastTrajectory}.jpg`} />
-            </div>
+              <a class="last-trajectory" href={`/dl/gravacao-${lastTrajectory}.npz`}>
+                <span>Baixar gravação da última trajetória realizada</span>
+                <img src={`/dl/gravacao-${lastTrajectory}.jpg`} />
+              </a>
             :
             null
           }
